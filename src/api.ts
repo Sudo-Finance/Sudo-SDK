@@ -1,7 +1,7 @@
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import { SuiClient } from '@mysten/sui.js/client';
-import { DataAPI } from './data';
+import { SudoDataAPI } from './sudoData';
 import { joinSymbol } from './utils';
 import { BCS } from '@mysten/bcs';
 import {
@@ -10,7 +10,7 @@ import {
   ALLOW_TRADE_NO_TRADE,
 } from './consts';
 
-export class API extends DataAPI {
+export class SudoAPI extends SudoDataAPI {
   constructor(network: string = 'testnet', provider: SuiClient | null = null) {
     super(network, provider);
   }
@@ -39,70 +39,6 @@ export class API extends DataAPI {
       : indexPrice * (1 - slippage);
     return BigInt(Math.round(raw * 1e18));
   }
-
-  deposit = async (
-    coin: string,
-    coinObjects: string[],
-    amount: number,
-    minAmountOut: number = 0,
-  ) => {
-    const tx = await this.initOracleTxb(
-      Object.keys(this.consts.pythFeeder.feeder),
-    );
-    const coinObject = this.#processCoins(tx, coin, coinObjects);
-    const [depositObject] = tx.splitCoins(coinObject, [tx.pure(amount)]);
-
-    const { vaultsValuation, symbolsValuation } = this.valuate(tx);
-
-    tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::deposit`,
-      typeArguments: [
-        `${this.consts.sudoCore.package}::slp::SLP`,
-        this.consts.coins[coin].module,
-      ],
-      arguments: [
-        tx.object(this.consts.sudoCore.market),
-        tx.object(this.consts.sudoCore.rebaseFeeModel),
-        depositObject,
-        tx.pure(minAmountOut),
-        vaultsValuation,
-        symbolsValuation,
-      ],
-    });
-    return tx;
-  };
-
-  withdraw = async (
-    coin: string,
-    alpCoinObjects: string[],
-    amount: number,
-    minAmountOut: number = 0,
-  ) => {
-    const tx = await this.initOracleTxb(
-      Object.keys(this.consts.pythFeeder.feeder),
-    );
-    const alpCoinObject = this.#processCoins(tx, 'slp', alpCoinObjects);
-    const [withdrawObject] = tx.splitCoins(alpCoinObject, [tx.pure(amount)]);
-
-    const { vaultsValuation, symbolsValuation } = this.valuate(tx);
-
-    tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::withdraw`,
-      typeArguments: [
-        `${this.consts.sudoCore.package}::slp::SLP`,
-        this.consts.coins[coin].module,
-      ],
-      arguments: [
-        tx.object(this.consts.sudoCore.market),
-        tx.object(this.consts.sudoCore.rebaseFeeModel),
-        withdrawObject,
-        tx.pure(minAmountOut),
-        vaultsValuation,
-        symbolsValuation,
-      ],
-    });
-    return tx;
-  };
 
   openPosition = async (
     collateralToken: string,

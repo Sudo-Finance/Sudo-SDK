@@ -1,6 +1,5 @@
 import { BCS } from '@mysten/bcs';
 import { bcs } from './bcs';
-import { SLP_TOKEN_DECIMALS } from './consts';
 import {
   getProvider,
   joinSymbol,
@@ -131,7 +130,7 @@ export interface IPositionConfig {
   minCollateralValue: number;
 }
 
-export class DataAPI extends OracleAPI {
+export class SudoDataAPI extends OracleAPI {
   provider: SuiClient;
 
   constructor(network: string = 'testnet', provider: SuiClient | null = null) {
