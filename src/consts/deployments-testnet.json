@@ -1,0 +1,95 @@
+{
+  "sudo_core": {
+    "package": "0x3b12e1d3c810b29484d9b81465aa9f093c744460c9208abcc7bc670335ae5d95",
+    "upgraded_packages": [],
+    "upgrade_cap": "0x83741904c28c6b9fe0bc36f2ee86e6bd54202e953845e10d2a6a6a931f8a368e",
+    "admin_cap": "0xb05f61cc3e1aadd8af400724b7b18327cfcc020a26ad3e64dd4aada3987d0bf7",
+    "market": "0x82936e643a8442642ab13e1fc606b657607d3a557c8964489f2393e5a3fec1a5",
+    "slp_metadata": "0x0ce67b827b72d35e9b9de0a57c069e8445bf3017ce01ccd079cb9a100825a562",
+    "rebase_fee_model": "0x3ed4f4fbc5d1c6c1637cb991826a31c9061ac1ee03e891d3525f922a0d57d2b1",
+    "vaults_parent": "0x4e7d6a80bf01bc0f0af5b6135c8afbcb3366a4eea2fb66d2076fe40836aa131d",
+    "symbols_parent": "0x2075286d1a1eb73dc4411c966f0c88cf99cc6a555ff0fa4496333b640d9ae2b6",
+    "positions_parent": "0x681968542c0c7bb91c89af83b6116873a719cbd503c0bfb0f8cbfe4fca50d3e4",
+    "vaults": {
+      "usdc": {
+        "weight": "1000000000000000000",
+        "reserving_fee_model": "0x2dc3a2bc1436920f5851eb0c93cfc57a38a2daba780fa7f907763e2bf706d610"
+      },
+      "usdt": {
+        "weight": "1000000000000000000",
+        "reserving_fee_model": "0x448eff7e271bb8d9a2c45962a2f89c192b8a4fa0056a713494b820a730f39e55"
+      },
+      "sui": {
+        "weight": "1000000000000000000",
+        "reserving_fee_model": "0xed8eb5a621e7b411da40b547a10224e858081dd5ef30d47ceeb9bfc3d7e95243"
+      }
+    },
+    "symbols": {
+      "long_tsla": {
+        "supported_collaterals": ["usdt", "usdc", "sui"],
+        "funding_fee_model": "0x68537dbfe9778ddeb1debc5dca6d172f4df23ec978430b0cc640eb4dc8fba4bc",
+        "position_config": "0x7d2006a7ac92e0248cdc7a0ade8b6265c914ebf9a546d272678d8e67db1dee02"
+      },
+      "short_tsla": {
+        "supported_collaterals": ["sui", "usdc", "usdt"],
+        "funding_fee_model": "0x47095942e7ade7911106eb26e171f91c566bf350360eb4b4262ca51b417244b5",
+        "position_config": "0xdbd8ed578af4be2122085997910870d9945dea4f3b30603f5b8e54d69b5486b8"
+      }
+    },
+    "referrals_parent": "0x1d0849985b2397a9042532487e4dba17dc2cbb963149a1890442686b95b646b4",
+    "orders_parent": "0x83eba2e36918c5dc64d17ccc55117d2ddfbcb29da01876796e8d841ddac6f8ae"
+  },
+  "pyth_feeder": {
+    "package": "0x975e063f398f720af4f33ec06a927f14ea76ca24f7f8dd544aa62ab9d5d15f44",
+    "state": "0xd8afde3a48b4ff7212bd6829a150f43f59043221200d63504d981f62bff2e27a",
+    "wormhole": {
+      "package": "0xcc029e2810f17f9f43f52262f40026a71fbdca40ed3803ad2884994361910b7e",
+      "state": "0xebba4cc4d614f7a7cdbe883acc76d1cc767922bc96778e7b68be0d15fce27c02"
+    },
+    "feeder": {
+      "sui": "0xe38dbe2ff3322f1500fff45d0046101f371eebce47c067c5e9233248c4878c28",
+      "usdt": "0x83f74b8a33b540cbf1edd24e219eac1215d1668a711ca2be3aa5d703763f91db",
+      "usdc": "0xa3d3e81bd7e890ac189b3f581b511f89333b94f445c914c983057e1ac09ff296",
+      "aapl": "0x36a954c1e0b1f3337ff3dc7abc503cddd6a89f2882a8c7e6778bde1014222410",
+      "meta": "0xd319e620fec988e65b9d90c07f70929a41853ab3c6968d20c148bcb132fc6125",
+      "tsla": "0xdd187aa48166150844ea07d1c1a5d488dc8bf51c90789ccede850bcd8a89b4a7"
+    }
+  },
+  "coins": {
+    "sui": {
+      "decimals": 9,
+      "module": "0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI",
+      "metadata": "0x587c29de216efd4219573e08a1f6964d4fa7cb714518c2c8a0f29abfa264327d"
+    },
+    "usdc": {
+      "decimals": 6,
+      "module": "0x456ea4ac7285a1eaeee7f4d1d8a10a45da88de3bc1ea70c050930ea4e6dfb743::usdc::USDC",
+      "metadata": "0x6e0ba3444fc9d6264e6a1cecfa326944ea61bd73c7bf24cfa012a709644cb677",
+      "treasury": "0xd1c79f6aa6aee53ffe1491916d38ba1dcb7adfa73a7add0f22146338cc786dc9"
+    },
+    "usdt": {
+      "decimals": 6,
+      "module": "0x2b37ec0afcb0336d404b7214c6f06c5c62ad32099393abe8401cf9da518189ed::usdt::USDT",
+      "metadata": "0x7d0a03417fa8d0270a16d298e799f25d34adca6cd66103b5435b5e96c81c918c",
+      "treasury": "0x9c84305e672a9bdb6675786cbe58fc4f93f02f16022ac031aeeeef0de7c9a2d2"
+    },
+    "tsla": {
+      "decimals": 6,
+      "module": "0x5d386e7ad60ab3b41fc7317abaaacbb4ec5cc222637ba39e31dcd3c0d4c71191::tsla::TSLA",
+      "metadata": "0x875d78d0907ca91a323622f520aed8095ffe98952d317ab60d75ed7aaa314a9a",
+      "treasury": "0xaa9d3551481165669667ed4e8f8b1b1e7e8812f9d1ec50e7aae070245da7baac"
+    },
+    "aapl": {
+      "decimals": 6,
+      "module": "0x93e47f7d0a6c45df6bec589af43ec864daac0f8ec7516b46e1f1b646d548469b::aapl::AAPL",
+      "metadata": "0xe57890fd3365ab21116e9e9b71d8a86142902bdb06d4b081ffae87062eeb97a1",
+      "treasury": "0x0243bd4223718a3c7f90e9b2f28b8588136615d4aceac04dbbad55b05ae2414d"
+    },
+    "meta": {
+      "decimals": 6,
+      "module": "0x8f93f15411890f72f4c9d0191956ca856f20f006ce6cab5bb3c820fe104aed4c::meta::META",
+      "metadata": "0x74510ee3cd8dcb8bd02822c72bb16f09d8f1a8a1e4dcb209d5842766d061098d",
+      "treasury": "0xa8bbd635eb3714768d55a32f157d8fee62f512ceb4704177a25148f3de464379"
+    }
+  }
+}
