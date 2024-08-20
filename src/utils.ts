@@ -1,6 +1,6 @@
 import { PriceServiceConnection } from '@pythnetwork/price-service-client';
 import { IConsts } from './consts';
-import { SuiClient } from '@mysten/sui.js/client';
+import { SuiClient } from '@mysten/sui/client';
 export function getProvider(network: string = 'testnet') {
   // Construct your connection:
   let url = 'https://explorer-rpc.devnet.sui.io/';
