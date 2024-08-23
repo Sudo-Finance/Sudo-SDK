@@ -1,6 +1,6 @@
 {
   "name": "sudo-sdk",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,15 +24,15 @@
   },
   "dependencies": {
     "@mysten/bcs": "^0.11.1",
-    "@mysten/dapp-kit": "^0.12.9",
-    "@mysten/sui.js": "^0.54.1",
-    "@pythnetwork/pyth-sui-js": "^2.0.0",
+    "@mysten/dapp-kit": "0.14.12",
+    "@mysten/sui": "1.3.0",
+    "@pythnetwork/pyth-sui-js": "2.1.0",
     "decimal.js": "^10.4.3"
   },
   "resolutions": {
     "axios": "1.1.0",
     "@mysten/bcs": "0.11.1",
-    "@mysten/sui.js": "0.54.1",
+    "@mysten/sui": "1.3.0",
     "typescript": "5.1.6"
   },
   "packageManager": "yarn@3.6.2"

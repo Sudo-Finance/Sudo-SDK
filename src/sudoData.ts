@@ -1,5 +1,6 @@
 import { BCS } from '@mysten/bcs';
 import { bcs } from './bcs';
+import { SLP_TOKEN_DECIMALS } from './consts';
 import {
   getProvider,
   joinSymbol,
@@ -7,10 +8,11 @@ import {
   parseValue,
   suiSymbolToSymbol,
 } from './utils';
-import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { SuiClient } from '@mysten/sui.js/client';
+import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui/utils';
+import { Transaction } from '@mysten/sui/transactions';
+import { SuiClient } from '@mysten/sui/client';
 import { OracleAPI } from './oracle';
+import { parsePosition } from './parser';
 
 export interface IMarketInfo {
   lpSupply: string;
@@ -119,6 +121,14 @@ export interface IMarketValuationInfo {
   apr?: number;
 }
 
+export interface IPositionConfigMap {
+  [key: string]: IPositionConfig;
+}
+
+export interface ITokenPrice {
+  [key: string]: number;
+}
+
 export interface IPositionConfig {
   decreaseFeeBps: number;
   liquidationBonus: number;
@@ -130,8 +140,33 @@ export interface IPositionConfig {
   minCollateralValue: number;
 }
 
+export interface IHistory {
+  owner: string;
+  txid: string;
+  id: string;
+  created: number;
+  eventName: string;
+  indexToken: string;
+  direction: string;
+  collateralAmount: number;
+  collateralPrice: number;
+  indexPrice: number;
+  pnl: number;
+  positionId: string;
+  volume: number;
+  fee: number;
+  network: string;
+}
+
+export interface GetCumulativeAprResponse {
+  generatedAt?: string;
+  apr?: string;
+}
+
+let aprResponse: GetCumulativeAprResponse = {};
 export class SudoDataAPI extends OracleAPI {
   provider: SuiClient;
+  apiEndpoint: string = 'https://api.sudofinance.xyz';
 
   constructor(network: string = 'testnet', provider: SuiClient | null = null) {
     super(network);
@@ -142,7 +177,7 @@ export class SudoDataAPI extends OracleAPI {
     }
   }
 
-  valuateVaults = (tx: TransactionBlock) => {
+  valuateVaults = (tx: Transaction) => {
     const vaultsValuation = tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::create_vaults_valuation`,
       typeArguments: [`${this.consts.sudoCore.package}::slp::SLP`],
@@ -171,7 +206,7 @@ export class SudoDataAPI extends OracleAPI {
     return vaultsValuation;
   };
 
-  valuateSymbols = (tx: TransactionBlock) => {
+  valuateSymbols = (tx: Transaction) => {
     const symbolsValuation = tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::create_symbols_valuation`,
       typeArguments: [`${this.consts.sudoCore.package}::slp::SLP`],
@@ -201,7 +236,7 @@ export class SudoDataAPI extends OracleAPI {
     return symbolsValuation;
   };
 
-  valuate = (tx: TransactionBlock) => {
+  valuate = (tx: Transaction) => {
     const vaultsValuation = this.valuateVaults(tx);
     const symbolsValuation = this.valuateSymbols(tx);
 
@@ -210,6 +245,19 @@ export class SudoDataAPI extends OracleAPI {
       symbolsValuation,
     };
   };
+
+  #parseMarketInfo(raw: any): IMarketInfo {
+    const content = raw.data.content.fields;
+
+    return {
+      lpSupply: content.lp_supply.fields.value,
+      positionId: content.positions.fields.id.id,
+      vaultId: content.vaults.fields.id.id,
+      symbolId: content.symbols.fields.id.id,
+      lpSupplyWithDecimals:
+        content.lp_supply.fields.value / 10 ** SLP_TOKEN_DECIMALS,
+    };
+  }
 
   #parseVaultInfo(raw: any): IVaultInfo {
     const vaultFields = raw.data.content.fields.value.fields;
@@ -357,6 +405,129 @@ export class SudoDataAPI extends OracleAPI {
     }
 
     return ret;
+  }
+
+  #parseHistoryInfo(event: any): IHistory {
+    const txid = event.id.txDigest;
+    const owner = event.sender;
+
+    const parsedPosition = parsePosition(event.type, event.parsedJson);
+
+    return {
+      txid,
+      owner,
+      ...parsedPosition.parsedDetail,
+      volume: parsedPosition.volume,
+      fee: parsedPosition.fee,
+      eventName: parsedPosition.eventName,
+      id: txid,
+      created: parseInt(event.timestampMs),
+      network: 'mainnet',
+    };
+  }
+
+  public async getPastFee(days = 7) {
+    const url = `${this.apiEndpoint}/histories/fee?network=${this.network}&days=${days}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return parseFloat((await res.text()) || '0');
+  }
+
+  public async getTotalFee() {
+    const url = `${this.apiEndpoint}/totalFee`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return parseFloat((await res.json()).totalFee || '0');
+  }
+
+  public async getSlpEntryPrice(trader: string) {
+    const url = `${this.apiEndpoint}/traderSlpEntryPrice?trader=${trader}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return parseFloat((await res.json()).entryPrice || '0');
+  }
+
+  public async getCumulativeApr() {
+    const refetchDate = new Date(Date.now() - 3600_000);
+    // fetch new every hour
+    if (
+      !aprResponse?.generatedAt ||
+      (aprResponse?.generatedAt &&
+        refetchDate > new Date(aprResponse?.generatedAt))
+    ) {
+      try {
+        const url = `${this.apiEndpoint}/cumulativeApr`;
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const data = await res.json();
+        aprResponse = { ...data };
+        return data.cumulativeApr;
+      } catch (e) {
+        console.error('Failed to get cumulative APR');
+      }
+
+      return 0;
+    } else {
+      return aprResponse.apr;
+    }
+  }
+
+  public async valuateMarket(): Promise<IMarketValuationInfo> {
+    const marketInfo = await this.getMarketInfo();
+    let slpPrice = 0;
+    let value = 0;
+    value = await this.simValuate(this.consts.sudoCore.adminCap);
+    slpPrice = value / marketInfo.lpSupplyWithDecimals;
+
+    return {
+      marketCap: value,
+      slpPrice: slpPrice,
+      slpSupply: marketInfo.lpSupplyWithDecimals,
+      apr: marketInfo.apr,
+    };
+  }
+
+  public async valuateMarketWithVaultsOnly(): Promise<IMarketValuationInfo> {
+    const marketInfo = await this.getMarketInfo();
+    let value = await this.simValuateVaults(this.consts.sudoCore.adminCap);
+    let slpPrice = value / marketInfo.lpSupplyWithDecimals;
+
+    return {
+      marketCap: value,
+      slpPrice: slpPrice,
+      slpSupply: marketInfo.lpSupplyWithDecimals,
+      apr: marketInfo.apr,
+    };
+  }
+
+  public async getMarketInfo() {
+    const rawData = await this.provider.getObject({
+      id: this.consts.sudoCore.market,
+      options: {
+        showContent: true,
+      },
+    });
+    const apr = await this.getCumulativeApr();
+    return {
+      ...this.#parseMarketInfo(rawData),
+      apr,
+    };
   }
 
   public async getVaultInfo(vaultToken: string) {
@@ -530,6 +701,18 @@ export class SudoDataAPI extends OracleAPI {
     return orderInfoList.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
   }
 
+  public async getHistoryInfoList(trader: string) {
+    const url = `${this.apiEndpoint}/traderEvents?trader=${trader}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const historyInfoList = await res.json();
+    return historyInfoList;
+  }
+
   simValuate = async (sender: string) => {
     const tx = await this.initOracleTxb(
       Object.keys(this.consts.pythFeeder.feeder),
@@ -625,13 +808,13 @@ export class SudoDataAPI extends OracleAPI {
       arguments: [
         aggPriceConfig,
         tx.object(this.consts.pythFeeder.feeder[indexToken]),
-        tx.pure(currentTimestamp, BCS.U64),
+        tx.pure.u64(currentTimestamp),
       ],
     });
     const deltaSize = tx.moveCall({
       target: `${this.consts.sudoCore.package}::pool::symbol_delta_size`,
       typeArguments: [],
-      arguments: [symbol, aggPrice, tx.pure(long)],
+      arguments: [symbol, aggPrice, tx.pure.bool(long)],
     });
     const LpSupplyAmount = tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::lp_supply_amount`,
@@ -648,7 +831,7 @@ export class SudoDataAPI extends OracleAPI {
       arguments: [
         tx.object(this.consts.sudoCore.symbols[symbol_].fundingFeeModel),
         PnlPerLp,
-        tx.pure(8 * 3600, BCS.U64),
+        tx.pure.u64(8 * 3600),
       ],
     });
 
@@ -699,16 +882,16 @@ export class SudoDataAPI extends OracleAPI {
       this.consts.sudoCore.vaults[collateralToken].weight,
     );
     const allVaultWeight = BigInt(vaultsValuation.total_weight);
-    const tx2 = new TransactionBlock();
+    const tx2 = new Transaction();
     tx2.moveCall({
       target: `${this.consts.sudoCore.package}::pool::compute_rebase_fee_rate`,
       arguments: [
         tx2.object(this.consts.sudoCore.rebaseFeeModel),
-        tx2.pure(increase),
-        tx2.pure(singleVaultValue, BCS.U256),
-        tx2.pure(allVaultValue, BCS.U256),
-        tx2.pure(singleVaultWeight, BCS.U256),
-        tx2.pure(allVaultWeight, BCS.U256),
+        tx2.pure.bool(increase),
+        tx2.pure.u256(singleVaultValue),
+        tx2.pure.u256(allVaultValue),
+        tx2.pure.u256(singleVaultWeight),
+        tx2.pure.u256(allVaultWeight),
       ],
     });
     const res2: any = await this.provider.devInspectTransactionBlock({
@@ -718,6 +901,46 @@ export class SudoDataAPI extends OracleAPI {
     const de = bcs.de(
       'Rate',
       new Uint8Array(res2.results[res2.results.length - 1].returnValues[0][0]),
+    );
+    return Number(BigInt(de)) / 1e18;
+  };
+
+  reservingFeeRate = async (
+    sender: string,
+    collateralToken: string,
+    amount: number = 0,
+  ) => {
+    const vaultInfo = await this.getVaultInfo(collateralToken);
+    const vaultSupply =
+      vaultInfo.liquidity +
+      vaultInfo.reservedAmount +
+      vaultInfo.unrealisedReservingFeeAmount +
+      amount;
+    const utilization = vaultSupply
+      ? parseInt(
+          (((vaultInfo.reservedAmount + amount) / vaultSupply) * 1e18).toFixed(
+            0,
+          ),
+        )
+      : 0;
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${this.consts.sudoCore.package}::model::compute_reserving_fee_rate`,
+      arguments: [
+        tx.object(
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel,
+        ),
+        tx.pure.u128(utilization),
+        tx.pure.u64(8 * 3600),
+      ],
+    });
+    const res: any = await this.provider.devInspectTransactionBlock({
+      transactionBlock: tx,
+      sender,
+    });
+    const de = bcs.de(
+      'Rate',
+      new Uint8Array(res.results[res.results.length - 1].returnValues[0][0]),
     );
     return Number(BigInt(de)) / 1e18;
   };
@@ -748,7 +971,7 @@ export class SudoDataAPI extends OracleAPI {
       arguments: [
         tx.object(this.consts.sudoCore.market),
         tx.object(position.id),
-        tx.pure(position.owner),
+        tx.pure.address(position.owner),
       ],
     });
     const vaultDeltaReservingRate = tx.moveCall({
@@ -760,7 +983,7 @@ export class SudoDataAPI extends OracleAPI {
           this.consts.sudoCore.vaults[position.collateralToken]
             .reservingFeeModel,
         ),
-        tx.pure((+new Date() / 1000).toFixed(0), BCS.U64),
+        tx.pure.u64((+new Date() / 1000).toFixed(0)),
       ],
     });
     const vaultAccReservingRate = tx.moveCall({
@@ -813,7 +1036,7 @@ export class SudoDataAPI extends OracleAPI {
       arguments: [
         tx.object(this.consts.sudoCore.market),
         tx.object(position.id),
-        tx.pure(position.owner),
+        tx.pure.address(position.owner),
       ],
     });
     const aggPriceConfig = tx.moveCall({
@@ -832,13 +1055,13 @@ export class SudoDataAPI extends OracleAPI {
       arguments: [
         aggPriceConfig,
         tx.object(this.consts.pythFeeder.feeder[position.indexToken]),
-        tx.pure((+new Date() / 1000).toFixed(0), BCS.U64),
+        tx.pure.u64((+new Date() / 1000).toFixed(0)),
       ],
     });
     const symbolDeltaSize = tx.moveCall({
       target: `${this.consts.sudoCore.package}::pool::symbol_delta_size`,
       typeArguments: [],
-      arguments: [symbol, appPrice, tx.pure(position.long)],
+      arguments: [symbol, appPrice, tx.pure.bool(position.long)],
     });
     const symbolDeltaFundingRate = tx.moveCall({
       target: `${this.consts.sudoCore.package}::pool::symbol_delta_funding_rate`,
@@ -852,7 +1075,7 @@ export class SudoDataAPI extends OracleAPI {
         ),
         symbolDeltaSize,
         lpSupplyAmount,
-        tx.pure((+new Date() / 1000).toFixed(0), BCS.U64),
+        tx.pure.u64((+new Date() / 1000).toFixed(0)),
       ],
     });
     const symbolAccFundingRate = tx.moveCall({
@@ -878,5 +1101,9 @@ export class SudoDataAPI extends OracleAPI {
       new Uint8Array(res.results[res.results.length - 1].returnValues[0][0]),
     );
     return (Number(BigInt(de.value)) * (de.is_positive ? 1 : -1)) / 1e18;
+  };
+
+  getHistories = async (owner: string): Promise<IHistory[]> => {
+    return await this.getHistoryInfoList(owner);
   };
 }

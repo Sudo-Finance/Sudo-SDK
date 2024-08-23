@@ -1,5 +1,5 @@
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { SuiClient } from '@mysten/sui.js/client';
+import { Transaction } from '@mysten/sui/transactions';
+import { SuiClient } from '@mysten/sui/client';
 import { PriceFeed } from '@pythnetwork/price-service-client';
 import {
   SuiPriceServiceConnection,
@@ -81,7 +81,7 @@ export class OracleAPI {
   }
 
   async initOracleTxb(tokens: string[]) {
-    const tx = new TransactionBlock();
+    const tx = new Transaction();
     // Remove redundant tokens first
     tokens = [...new Set(tokens)];
 

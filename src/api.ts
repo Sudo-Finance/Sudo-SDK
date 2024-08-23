@@ -1,9 +1,8 @@
-import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui.js/utils';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { SuiClient } from '@mysten/sui.js/client';
-import { SudoDataAPI } from './sudoData';
+import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui/utils';
+import { Transaction } from '@mysten/sui/transactions';
+import { SuiClient } from '@mysten/sui/client';
+import { IPositionConfig, SudoDataAPI } from './sudoData';
 import { joinSymbol } from './utils';
-import { BCS } from '@mysten/bcs';
 import {
   ALLOW_TRADE_CAN_TRADE,
   ALLOW_TRADE_MUST_TRADE,
@@ -15,18 +14,14 @@ export class SudoAPI extends SudoDataAPI {
     super(network, provider);
   }
 
-  #processCoins = (
-    tx: TransactionBlock,
-    coin: string,
-    coinObjects: string[],
-  ) => {
+  #processCoins = (tx: Transaction, coin: string, coinObjects: string[]) => {
     if (coin === 'sui') {
       return tx.gas;
     } else {
       if (coinObjects.length > 1) {
         tx.mergeCoins(
           tx.object(coinObjects[0]),
-          coinObjects.slice(1).map(coinObject => tx.object(coinObject)),
+          coinObjects.slice(1).map((coinObject) => tx.object(coinObject))
         );
       }
       return tx.object(coinObjects[0]);
@@ -43,36 +38,68 @@ export class SudoAPI extends SudoDataAPI {
   openPosition = async (
     collateralToken: string,
     indexToken: string,
-    size: bigint,
-    collateralAmount: bigint,
+    leverage: number,
+    payAmount: number,
+    positionConfig: IPositionConfig,
     coinObjects: string[],
     long: boolean,
-    reserveAmount: bigint,
-    indexPrice: number,
+    indexPrice: number, // This can be the market price or limit price
     collateralPrice: number,
     pricesSlippage: number = 0.003,
     collateralSlippage: number = 0.5,
     isLimitOrder: boolean = false,
     isIocOrder: boolean = false,
-    relayerFee: bigint = BigInt(1),
+    relayerFee: bigint = BigInt(1)
   ) => {
     const tx = await this.initOracleTxb([collateralToken, indexToken]);
     const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
-    const [depositObject] = tx.splitCoins(coinObject, [
-      tx.pure(collateralAmount),
-    ]);
-    const feeObject = tx.splitCoins(tx.gas, [tx.pure(relayerFee)]);
 
     const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+
+    let effectiveLeverage = leverage;
+    if (positionConfig?.maxLeverage === leverage) {
+      effectiveLeverage = leverage * 0.999;
+    }
+
+    const realLeverage = leverage / (1 + positionConfig?.openFeeBps * leverage);
+
+    const leveragedAmount =
+      (payAmount * collateralPrice * realLeverage) / indexPrice;
+
+    const reserveAmount = BigInt(
+      (
+        payAmount *
+        Math.min(
+          effectiveLeverage,
+          positionConfig?.maxReservedMultiplier || 0
+        ) *
+        10 ** this.consts.coins[collateralToken].decimals
+      ).toFixed(0)
+    );
+
+    const size = BigInt(
+      (leveragedAmount * 10 ** this.consts.coins[indexToken].decimals).toFixed(
+        0
+      )
+    );
+    const collateralAmount = BigInt(
+      (payAmount * 10 ** this.consts.coins[collateralToken].decimals).toFixed(0)
+    );
+
+    const [depositObject] = tx.splitCoins(coinObject, [
+      tx.pure.u64(collateralAmount),
+    ]);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]);
+
     const adjustPrice = this.#processSlippage(
       indexPrice,
       long,
-      isLimitOrder ? 0 : pricesSlippage,
+      isLimitOrder ? 0 : pricesSlippage
     );
     const adjustCollateralPrice = this.#processSlippage(
       collateralPrice,
       false,
-      collateralSlippage,
+      collateralSlippage
     );
 
     let allowTrade = ALLOW_TRADE_MUST_TRADE;
@@ -97,7 +124,7 @@ export class SudoAPI extends SudoDataAPI {
         tx.object(SUI_CLOCK_OBJECT_ID),
         tx.object(this.consts.sudoCore.market),
         tx.object(
-          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel,
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
         ),
         tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
         tx.object(this.consts.sudoCore.symbols[symbol].positionConfig),
@@ -105,12 +132,12 @@ export class SudoAPI extends SudoDataAPI {
         tx.object(this.consts.pythFeeder.feeder[indexToken]),
         depositObject,
         feeObject,
-        tx.pure(allowTrade, BCS.U8),
-        tx.pure(size),
-        tx.pure(reserveAmount),
-        tx.pure(adjustCollateralPrice, BCS.U256),
-        tx.pure(adjustPrice, BCS.U256),
-        tx.pure(isLimitOrder, BCS.BOOL),
+        tx.pure.u8(allowTrade),
+        tx.pure.u64(size),
+        tx.pure.u64(reserveAmount),
+        tx.pure.u256(adjustCollateralPrice),
+        tx.pure.u256(adjustPrice),
+        tx.pure.bool(isLimitOrder),
       ],
     });
     return tx;
@@ -122,11 +149,11 @@ export class SudoAPI extends SudoDataAPI {
     indexToken: string,
     amount: number,
     coinObjects: string[],
-    long: boolean,
+    long: boolean
   ) => {
     const tx = await this.initOracleTxb([collateralToken, indexToken]);
     const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
-    const [depositObject] = tx.splitCoins(coinObject, [tx.pure(amount)]);
+    const [depositObject] = tx.splitCoins(coinObject, [tx.pure.u64(amount)]);
 
     tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::pledge_in_position`,
@@ -150,7 +177,7 @@ export class SudoAPI extends SudoDataAPI {
     collateralToken: string,
     indexToken: string,
     amount: number,
-    long: boolean,
+    long: boolean
   ) => {
     const tx = await this.initOracleTxb([collateralToken, indexToken]);
     const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
@@ -168,12 +195,12 @@ export class SudoAPI extends SudoDataAPI {
         tx.object(this.consts.sudoCore.market),
         tx.object(pcpId),
         tx.object(
-          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel,
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
         ),
         tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
         tx.object(this.consts.pythFeeder.feeder[collateralToken]),
         tx.object(this.consts.pythFeeder.feeder[indexToken]),
-        tx.pure(amount),
+        tx.pure.u64(amount),
       ],
     });
 
@@ -184,30 +211,35 @@ export class SudoAPI extends SudoDataAPI {
     pcpId: string,
     collateralToken: string,
     indexToken: string,
+    positionAmount: number,
     amount: bigint,
     long: boolean,
+    marketPrice: number,
     indexPrice: number,
     collateralPrice: number,
     isTriggerOrder: boolean = false,
-    isTakeProfitOrder: boolean = true,
     isIocOrder: boolean = false,
     pricesSlippage: number = 0.003,
     collateralSlippage: number = 0.5,
-    relayerFee: bigint = BigInt(1),
+    relayerFee: bigint = BigInt(1)
   ) => {
     const tx = await this.initOracleTxb([collateralToken, indexToken]);
     const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
-    const feeObject = tx.splitCoins(tx.gas, [tx.pure(relayerFee)]);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]);
+
+    let isTakeProfitOrder =
+      (!long && (indexPrice || 0) < marketPrice) ||
+      (long && (indexPrice || 0) > marketPrice);
 
     const adjustPrice = this.#processSlippage(
       indexPrice,
       !long,
-      isTriggerOrder ? 0 : pricesSlippage,
+      isTriggerOrder ? 0 : pricesSlippage
     );
     const adjustCollateralPrice = this.#processSlippage(
       collateralPrice,
       false,
-      collateralSlippage,
+      collateralSlippage
     );
 
     let allowTrade = ALLOW_TRADE_MUST_TRADE;
@@ -235,20 +267,24 @@ export class SudoAPI extends SudoDataAPI {
         tx.object(this.consts.sudoCore.market),
         tx.object(pcpId),
         tx.object(
-          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel,
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
         ),
         tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
         tx.object(this.consts.pythFeeder.feeder[collateralToken]),
         tx.object(this.consts.pythFeeder.feeder[indexToken]),
         feeObject,
-        tx.pure(allowTrade, BCS.U8),
-        tx.pure(isTakeProfitOrder),
-        tx.pure(amount),
-        tx.pure(adjustCollateralPrice, BCS.U256),
-        tx.pure(adjustPrice, BCS.U256),
-        tx.pure(isTriggerOrder, BCS.BOOL),
+        tx.pure.u8(allowTrade),
+        tx.pure.bool(isTakeProfitOrder),
+        tx.pure.u64(amount),
+        tx.pure.u256(adjustCollateralPrice),
+        tx.pure.u256(adjustPrice),
+        tx.pure.bool(isTriggerOrder),
       ],
     });
+
+    if (amount === BigInt(positionAmount) && !isTriggerOrder) {
+      this.clearClosedPosition(pcpId, collateralToken, indexToken, long, tx);
+    }
 
     return tx;
   };
@@ -258,9 +294,9 @@ export class SudoAPI extends SudoDataAPI {
     collateralToken: string,
     indexToken: string,
     long: boolean,
-    type: string,
+    type: string
   ) => {
-    const tx = new TransactionBlock();
+    const tx = new Transaction();
     let functionName = '';
     switch (type) {
       case 'OPEN_POSITION':
@@ -293,14 +329,14 @@ export class SudoAPI extends SudoDataAPI {
     fromToken: string,
     toToken: string,
     fromAmount: bigint,
-    fromCoinObjects: string[],
+    fromCoinObjects: string[]
   ) => {
     const tx = await this.initOracleTxb(
-      Object.keys(this.consts.sudoCore.vaults),
+      Object.keys(this.consts.sudoCore.vaults)
     );
     const fromCoinObject = this.#processCoins(tx, fromToken, fromCoinObjects);
     const [fromDepositObject] = tx.splitCoins(fromCoinObject, [
-      tx.pure(fromAmount),
+      tx.pure.u64(fromAmount),
     ]);
     const vaultsValuation = this.valuateVaults(tx);
 
@@ -316,7 +352,7 @@ export class SudoAPI extends SudoDataAPI {
         tx.object(this.consts.sudoCore.rebaseFeeModel),
         fromDepositObject,
         // FIXME: minAmountOut
-        tx.pure(0),
+        tx.pure.u64(0),
         vaultsValuation,
       ],
     });
@@ -328,7 +364,7 @@ export class SudoAPI extends SudoDataAPI {
     collateralToken: string,
     indexToken: string,
     long: boolean,
-    tx: TransactionBlock,
+    tx: Transaction
   ) => {
     tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::clear_closed_position`,
@@ -347,7 +383,7 @@ export class SudoAPI extends SudoDataAPI {
     collateralToken: string,
     indexToken: string,
     long: boolean,
-    tx: TransactionBlock,
+    tx: Transaction
   ) => {
     tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::clear_open_position_order_v1_1`,
@@ -370,7 +406,7 @@ export class SudoAPI extends SudoDataAPI {
     collateralToken: string,
     indexToken: string,
     long: boolean,
-    tx: TransactionBlock,
+    tx: Transaction
   ) => {
     tx.moveCall({
       target: `${this.consts.sudoCore.package}::market::clear_decrease_position_order_v1_1`,
