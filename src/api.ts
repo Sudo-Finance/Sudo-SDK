@@ -39,7 +39,7 @@ export class SudoAPI extends SudoDataAPI {
     collateralToken: string,
     indexToken: string,
     leverage: number,
-    payAmount: number,
+    collateral: number,
     positionConfig: IPositionConfig,
     coinObjects: string[],
     long: boolean,
@@ -64,11 +64,11 @@ export class SudoAPI extends SudoDataAPI {
     const realLeverage = leverage / (1 + positionConfig?.openFeeBps * leverage);
 
     const leveragedAmount =
-      (payAmount * collateralPrice * realLeverage) / indexPrice;
+      (collateral * collateralPrice * realLeverage) / indexPrice;
 
     const reserveAmount = BigInt(
       (
-        payAmount *
+        collateral *
         Math.min(
           effectiveLeverage,
           positionConfig?.maxReservedMultiplier || 0
@@ -83,7 +83,7 @@ export class SudoAPI extends SudoDataAPI {
       )
     );
     const collateralAmount = BigInt(
-      (payAmount * 10 ** this.consts.coins[collateralToken].decimals).toFixed(0)
+      (collateral * 10 ** this.consts.coins[collateralToken].decimals).toFixed(0)
     );
 
     const [depositObject] = tx.splitCoins(coinObject, [

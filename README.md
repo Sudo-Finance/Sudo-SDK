@@ -15,7 +15,7 @@ openPosition(
   collateralToken: string,
   indexToken: string,
   leverage: number,
-  payAmount: number,
+  collateral: number,
   positionConfig: IPositionConfig,
   coinObjects: string[],
   long: boolean,
@@ -34,7 +34,7 @@ openPosition(
 - `collateralToken`: The token used as collateral (e.g., "USDC")
 - `indexToken`: The token used as the market index (e.g., "SUI")
 - `leverage`: The size of the position in base units (number)
-- `payAmount`: The amount of collateral to deposit (number)
+- `collateral`: The amount of collateral to deposit (number)
 - `positionConfig`: Configuration object for the position (IPositionConfig)
 - `coinObjects`: Array of coin object IDs to use for the transaction
 - `long`: Boolean indicating if this is a long (true) or short (false) position
