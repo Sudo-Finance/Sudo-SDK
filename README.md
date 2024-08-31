@@ -59,20 +59,20 @@ const provider = getProvider(network);
 const sudoAPI = new SudoAPI(network, provider);
 
 const tx = await sudoAPI.openPosition(
-  'USDC',           // collateralToken
-  'BTC',            // indexToken
-  BigInt(1000000),  // size (1 BTC if BTC has 6 decimals)
-  BigInt(50000000), // collateralAmount (50,000 USDC if USDC has 6 decimals)
-  ['0x123...', '0x456...'], // coinObjects
-  true,             // long position
-  BigInt(100000),   // reserveAmount
-  50000,            // indexPrice (BTC price in USD)
-  1,                // collateralPrice (USDC price in USD)
-  0.001,            // pricesSlippage (0.1%)
-  0.1,              // collateralSlippage (10%)
-  false,            // not a limit order
-  false,            // not an IOC order
-  BigInt(2)         // relayerFee
+  'USDC',
+  'SUI',
+  5,                    // 5x leverage
+  1000,                 // 1000 USDC as collateral
+  myPositionConfig,
+  ['coin1', 'coin2'],
+  true,                 // long position
+  2,                    // SUI price
+  1,                    // USDC price
+  0.005,                // 0.5% price slippage
+  0.1,                  // 10% collateral slippage
+  false,                // not a limit order
+  false,                // not an IOC order
+  BigInt(2)             // relayer fee
 );
 
 ```
