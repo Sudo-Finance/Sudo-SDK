@@ -14,11 +14,11 @@ The `openPosition` function is part of our TypeScript SDK for interacting with o
 openPosition(
   collateralToken: string,
   indexToken: string,
-  size: bigint,
-  collateralAmount: bigint,
+  leverage: number,
+  payAmount: number,
+  positionConfig: IPositionConfig,
   coinObjects: string[],
   long: boolean,
-  reserveAmount: bigint,
   indexPrice: number,
   collateralPrice: number,
   pricesSlippage: number = 0.003,
@@ -26,18 +26,18 @@ openPosition(
   isLimitOrder: boolean = false,
   isIocOrder: boolean = false,
   relayerFee: bigint = BigInt(1)
-): Promise<TransactionBlock>
+): Promise<Transaction>
 ```
 
 ### Parameters
 
 - `collateralToken`: The token used as collateral (e.g., "USDC")
-- `indexToken`: The token used as the market index (e.g., "BTC")
-- `size`: The size of the position in base units (bigint)
-- `collateralAmount`: The amount of collateral to deposit (bigint)
+- `indexToken`: The token used as the market index (e.g., "SUI")
+- `leverage`: The size of the position in base units (number)
+- `payAmount`: The amount of collateral to deposit (number)
+- `positionConfig`: Configuration object for the position (IPositionConfig)
 - `coinObjects`: Array of coin object IDs to use for the transaction
 - `long`: Boolean indicating if this is a long (true) or short (false) position
-- `reserveAmount`: The amount to reserve for the position (bigint)
 - `indexPrice`: The current price of the index token
 - `collateralPrice`: The current price of the collateral token
 - `pricesSlippage`: Maximum allowed slippage for prices (default: 0.003 or 0.3%)
@@ -48,7 +48,7 @@ openPosition(
 
 ### Return Value
 
-Returns a `Promise` that resolves to a `TransactionBlock` object. This object represents the transaction that will open the position when executed.
+Returns a `Promise` that resolves to a `Transaction` object. This object represents the transaction that will open the position when executed.
 
 ### Usage Example
 
