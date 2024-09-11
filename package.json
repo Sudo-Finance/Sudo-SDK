@@ -1,7 +1,7 @@
 {
   "name": "sudo-sdk",
-  "version": "0.0.3",
-  "description": "",
+  "version": "0.0.5",
+  "description": "Sudo SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

@@ -80,8 +80,8 @@ export type ReversedKeyValue<T extends object> = {
   [K in keyof T]: T[K] extends keyof T
     ? keyof T
     : T[K] extends keyof T | infer V
-      ? V
-      : never;
+    ? V
+    : never;
 };
 
 export function reverseKeyValue<T extends object>(obj: T): ReversedKeyValue<T> {

@@ -2,6 +2,7 @@ import { BCS } from '@mysten/bcs';
 import { bcs } from './bcs';
 import { SLP_TOKEN_DECIMALS } from './consts';
 import {
+  decimalToObject,
   getProvider,
   joinSymbol,
   parseSymbolKey,
@@ -345,8 +346,9 @@ export class SudoDataAPI extends OracleAPI {
       try {
         positionInfo.reservingFeeAmount =
           await this.calcPositionReserveFeeAmount(positionInfo);
-        positionInfo.fundingFeeValue =
-          await this.calcPositionFundingFeeValue(positionInfo);
+        positionInfo.fundingFeeValue = await this.calcPositionFundingFeeValue(
+          positionInfo,
+        );
       } catch (e) {
         console.error(e);
         positionInfo.reservingFeeAmount = 0;
@@ -382,7 +384,7 @@ export class SudoDataAPI extends OracleAPI {
         dataType.split(',')[3].split('>')[0].trim(),
         this.consts,
       ),
-      indexPrice: parseValue(fields.limited_index_price.fields.value / 1e18),
+      indexPrice: decimalToObject(fields.limited_index_price.fields),
       collateralPriceThreshold: parseValue(fields.collateral_price_threshold),
       feeAmount: BigInt(fields.fee),
       long: dataType.includes('::market::LONG'),
