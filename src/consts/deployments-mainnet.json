@@ -26,7 +26,7 @@
         "reserving_fee_model": "0xbb09fbc5c2103ffcde3c589463c700b7c6cd2c2a462429c6b5fd147c7b1aba4f"
       },
       "navx": {
-        "weight": "100000000000000000",
+        "weight": "50000000000000000",
         "reserving_fee_model": "0xe9261453c7658fa12d9babac4eea3062425c5ca6ac638f28502bb43ea3d13679"
       },
       "afSui": {
@@ -36,6 +36,10 @@
       "vSui": {
         "weight": "200000000000000000",
         "reserving_fee_model": "0xc02335751b486792862e2d04402f64296442e104e2ee79e1ef9a56f038a2cd2e"
+      },
+      "fud": {
+        "weight": "50000000000000000",
+        "reserving_fee_model": "0xc02cbd95ebb56e13fe6cb0ec49ddf2bebf7655cbca18f1e063bc1e1df8ceb6ea"
       }
     },
     "symbols": {
