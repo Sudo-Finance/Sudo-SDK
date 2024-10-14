@@ -513,7 +513,7 @@
     },
     "govt": {
       "decimals": 8,
-      "module": "0xe9ba9b5b517c0ee1b87bb31df86e782118e0dcab785f4070947bcc50804823c::govt::GOVT",
+      "module": "0x0e9ba9b5b517c0ee1b87bb31df86e782118e0dcab785f4070947bcc50804823c::govt::GOVT",
       "metadata": "0xc794a70bd9ba02630db2f7d1fafc3844a5dc20080fee4644a716f9091a950161"
     },
     "bonk": {
