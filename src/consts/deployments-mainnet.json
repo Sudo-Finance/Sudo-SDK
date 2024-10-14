@@ -18,11 +18,11 @@
         "reserving_fee_model": "0x06420378d3b4bdba8d5afc2f88d33b7c7640aa14330c35f14c9874289147f15b"
       },
       "usdc": {
-        "weight": "200000000000000000",
+        "weight": "150000000000000000",
         "reserving_fee_model": "0x75183cd63566bf3ef9c5d1ec790a28e5b0a75a0901a33b48e1e8423a62a6eb9d"
       },
       "usdt": {
-        "weight": "100000000000000000",
+        "weight": "50000000000000000",
         "reserving_fee_model": "0xbb09fbc5c2103ffcde3c589463c700b7c6cd2c2a462429c6b5fd147c7b1aba4f"
       },
       "navx": {
@@ -40,6 +40,10 @@
       "fud": {
         "weight": "50000000000000000",
         "reserving_fee_model": "0xc02cbd95ebb56e13fe6cb0ec49ddf2bebf7655cbca18f1e063bc1e1df8ceb6ea"
+      },
+      "buck": {
+        "weight": "100000000000000000",
+        "reserving_fee_model": "0xb5bfc5231b21059123fd4c0bdb39af025ec3025683d43fe23e05cf792bcbc8b8"
       }
     },
     "symbols": {
@@ -467,7 +471,8 @@
       "gme": "0xd636a14b206a1d57190385735b980f0f26fdfa507cde63746ea621ce8fafd150",
       "afSui": "0xd779885c5246357e24cbde7348f2d81f756d9650975c02d81346b15d8b557ebf",
       "vSui": "0xf3bc79117acc3636d57778d9d0f83a871df1b7a53eb61fe893ff108d9664ec8b",
-      "fud": "0x4531c3ed0d22f21f5fce882905372006c9aafa30f01db03b789e95a6c50de7b2"
+      "fud": "0x4531c3ed0d22f21f5fce882905372006c9aafa30f01db03b789e95a6c50de7b2",
+      "buck": "0x3ef821a54dbdfe3f211b2ff7261dea0f0330c72fd292422ce586e21f43809a56"
     }
   },
   "coins": {
@@ -575,6 +580,11 @@
       "decimals": 5,
       "module": "0x76cb819b01abed502bee8a702b4c2d547532c12f25001c9dea795a5e631c26f1::fud::FUD",
       "metadata": "0x01087411ef48aaac1eb6e24803213e3a60a03b147dac930e5e341f17a85e524e"
+    },
+    "buck": {
+      "decimals": 9,
+      "module": "0xce7ff77a83ea0cb6fd39bd8748e2ec89a3f41e8efdc3f4eb123e0ca37b184db2::buck::BUCK",
+      "metadata": "0x0db5e20f3fc2b12e294e5474babbec1c2efd96f21663accfbcb25da99a48838a"
     }
   }
 }
