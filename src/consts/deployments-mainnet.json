@@ -440,6 +440,84 @@
         ],
         "funding_fee_model": "0x7c5ea90c10bd09d328740c35183421e02498ddcaac7e5aeee2b7b01eef22ed2f",
         "position_config": "0x9abbaee4afe1246cb4e3d119ce997ce23b6a450eedf29bae3211bf69c1b0b9d3"
+      },
+      "long_btc": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0xe069554aaa52d9c817cff69e694ad260db166402f6b2e2c34e2ddc32a3f517ab",
+        "position_config": "0x05dcc85ccb2373769daf609222b6c5e9c9e044ee9cf06c693b3d52706d9e353a"
+      },
+      "short_btc": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0x858c25a2cd835af80fbadf4038bd921920980d9dfa46284fb7290222e3226d8e",
+        "position_config": "0x8a2b02a9c5f83b575a5ead5a384e0c03dd6d0dc4be66eeffa72cdbf05595354a"
+      },
+      "long_eth": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0x86ddf1808299e47d830dcada590549634ec500ac16a44c11bf3ff71554dd32bd",
+        "position_config": "0xb77069624c1bd4490796a3845d9b38e71fbd18c2466cee150f4f7994c499fdf2"
+      },
+      "short_eth": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0xdf83227866bf9909ef4f8e68cd10c486f46bf4095a7f6dc068e4904d57b13628",
+        "position_config": "0x65a1fadd23a517677d1b5c8d9011c3491d8ca063b692b4a5f0f196f27f6f566c"
+      },
+      "long_sol": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0x7fe12e9a885145aef1f9455690eb36431a0b661aebcb10eb83f75a3d6f16a8cb",
+        "position_config": "0xe5c13e22f55070f7b766ac02ddc897829dd911189654cdb4bcce0351e751cfc6"
+      },
+      "short_sol": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0xa32e3d38ec21a3d6784f93c532813b0054efcc25055daa30351048629f31c59f",
+        "position_config": "0x14cb89dadf7cd1f80de22a2e6a29b2742be9775d6303d42dc1c900bb5fd68106"
       }
     }
   },
@@ -472,7 +550,10 @@
       "afSui": "0xd779885c5246357e24cbde7348f2d81f756d9650975c02d81346b15d8b557ebf",
       "vSui": "0xf3bc79117acc3636d57778d9d0f83a871df1b7a53eb61fe893ff108d9664ec8b",
       "fud": "0x4531c3ed0d22f21f5fce882905372006c9aafa30f01db03b789e95a6c50de7b2",
-      "buck": "0x3ef821a54dbdfe3f211b2ff7261dea0f0330c72fd292422ce586e21f43809a56"
+      "buck": "0x3ef821a54dbdfe3f211b2ff7261dea0f0330c72fd292422ce586e21f43809a56",
+      "sol": "0x9d0d275efbd37d8a8855f6f2c761fa5983293dd8ce202ee5196626de8fcd4469",
+      "btc": "0x9a62b4863bdeaabdc9500fce769cf7e72d5585eeb28a6d26e4cafadc13f76ab2",
+      "eth": "0x9193fd47f9a0ab99b6e365a464c8a9ae30e6150fc37ed2a89c1586631f6fc4ab"
     }
   },
   "coins": {
@@ -585,6 +666,21 @@
       "decimals": 9,
       "module": "0xce7ff77a83ea0cb6fd39bd8748e2ec89a3f41e8efdc3f4eb123e0ca37b184db2::buck::BUCK",
       "metadata": "0x0db5e20f3fc2b12e294e5474babbec1c2efd96f21663accfbcb25da99a48838a"
+    },
+    "btc": {
+      "decimals": 8,
+      "module": "0x027792d9fed7f9844eb4839566001bb6f6cb4804f66aa2da6fe1ee242d896881::coin::COIN",
+      "metadata": "0x5d3c6e60eeff8a05b693b481539e7847dfe33013e7070cdcb387f5c0cac05dfd"
+    },
+    "eth": {
+      "decimals": 8,
+      "module": "0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN",
+      "metadata": "0x8900e4ceede3363bef086d6b50ca89d816d0e90bf6bc46efefe1f8455e08f50f"
+    },
+    "sol": {
+      "decimals": 8,
+      "module": "0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN",
+      "metadata": "0x4d2c39082b4477e3e79dc4562d939147ab90c42fc5f3e4acf03b94383cd69b6e"
     }
   }
 }
