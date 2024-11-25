@@ -625,12 +625,15 @@ export class SudoDataAPI extends OracleAPI {
             },
           },
         });
-        positionInfoList.push(
-          await this.#parsePositionInfo(
-            positionRaw,
-            positionCapInfo.positionCapId,
-          ),
-        );
+
+        if (positionRaw?.data?.content) {
+          positionInfoList.push(
+            await this.#parsePositionInfo(
+              positionRaw,
+              positionCapInfo.positionCapId,
+            ),
+          );
+        }
       }),
     );
 
