@@ -151,42 +151,6 @@
         "funding_fee_model": "0x4bafb53187f78ff6ead25f0507c4c071a0502ac74366aa03dd49fc13edf5177b",
         "position_config": "0xb22a5641631cb41ee1965b569a84a38490c5b7920ffc0e50bf814c6dea2b9188"
       },
-      "long_navx": {
-        "supported_collaterals": ["sui", "usdc", "navx"],
-        "funding_fee_model": "0xf08d2abe94ce63f08e2ef59eaccd0796e4f6044b77cc555feb3e4570429d28cb",
-        "position_config": "0x57f26c5e576ae860acb17e8e5639ad31262d463ef62a5f5703853a14008fdfa2"
-      },
-      "short_navx": {
-        "supported_collaterals": ["sui", "usdc", "navx"],
-        "funding_fee_model": "0xd652a240b6cb424bdf848293beee6fdb2e1f67f52cca0595b2a10d82aedb3535",
-        "position_config": "0xf8f22efa91b4e78ab458a7122bd394b9a177fb43ed26cfb3c1f27d3b7ac69ddd"
-      },
-      "long_w": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "navx",
-          "usdt",
-          "vSui",
-          "fud",
-          "afSui"
-        ],
-        "funding_fee_model": "0xd8d604c139189f8091f4c2570228759c189019c6b4c5703e36136d9c810478ee",
-        "position_config": "0xdbf5cbb616466e8a1075eaec0a761d27820ebf87af084f50b1e1225bc27814f8"
-      },
-      "short_w": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "navx",
-          "usdt",
-          "vSui",
-          "fud",
-          "afSui"
-        ],
-        "funding_fee_model": "0x65132effa376785b8259b5679093bd6b425b0a252416ca133bfb53cdef75f5f7",
-        "position_config": "0xabe745b40968d1b8ad8347c5c64973a70e6e5e51701de561c5dd763118b15e8e"
-      },
       "long_fud": {
         "supported_collaterals": [
           "sui",
@@ -288,6 +252,94 @@
         ],
         "funding_fee_model": "0xa32e3d38ec21a3d6784f93c532813b0054efcc25055daa30351048629f31c59f",
         "position_config": "0x14cb89dadf7cd1f80de22a2e6a29b2742be9775d6303d42dc1c900bb5fd68106"
+      },
+      "long_xrp": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0x81fd517288729b3037ef72e91ca81113a6eae0a22a55b3eb47391bc190d98cd6",
+        "position_config": "0xc9dc75c9f6b85cd06764b828d3c462757a606efc3f0553018e2894af2fd239db"
+      },
+      "short_xrp": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0x532bc45f86c887bf4523ee6b29df3ecc88ed3217cdafe68c5c9473de03f2a7a3",
+        "position_config": "0x0315fa104d694b9289e8887e4f60fad3e22264918560a9a5d26d60c9d3b9fa41"
+      },
+      "long_doge": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0xc8726ab06b575a2c7c1c6d089867e512b6816ea1288a1fd54d40628ca17b410c",
+        "position_config": "0x23cdf63650b81ca8756e429bc01d20607d9171476be47dcf5710366b1e06808e"
+      },
+      "short_doge": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx"
+        ],
+        "funding_fee_model": "0x2061d0cdd96612a7d5dc81b9d0cfee8820a056ce351294750cdf44d1d1a32aa6",
+        "position_config": "0x23dec742fab6f4b7de4668eabd7daf3dae4e59c790ffef3f709cd0a3cdfc0914"
+      },
+      "long_navx": {
+        "supported_collaterals": ["sui", "usdc", "navx"],
+        "funding_fee_model": "0xf08d2abe94ce63f08e2ef59eaccd0796e4f6044b77cc555feb3e4570429d28cb",
+        "position_config": "0x57f26c5e576ae860acb17e8e5639ad31262d463ef62a5f5703853a14008fdfa2"
+      },
+      "short_navx": {
+        "supported_collaterals": ["sui", "usdc", "navx"],
+        "funding_fee_model": "0xd652a240b6cb424bdf848293beee6fdb2e1f67f52cca0595b2a10d82aedb3535",
+        "position_config": "0xf8f22efa91b4e78ab458a7122bd394b9a177fb43ed26cfb3c1f27d3b7ac69ddd"
+      },
+      "long_w": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "navx",
+          "usdt",
+          "vSui",
+          "fud",
+          "afSui"
+        ],
+        "funding_fee_model": "0xd8d604c139189f8091f4c2570228759c189019c6b4c5703e36136d9c810478ee",
+        "position_config": "0xdbf5cbb616466e8a1075eaec0a761d27820ebf87af084f50b1e1225bc27814f8"
+      },
+      "short_w": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "navx",
+          "usdt",
+          "vSui",
+          "fud",
+          "afSui"
+        ],
+        "funding_fee_model": "0x65132effa376785b8259b5679093bd6b425b0a252416ca133bfb53cdef75f5f7",
+        "position_config": "0xabe745b40968d1b8ad8347c5c64973a70e6e5e51701de561c5dd763118b15e8e"
       }
     }
   },
@@ -323,7 +375,9 @@
       "buck": "0x3ef821a54dbdfe3f211b2ff7261dea0f0330c72fd292422ce586e21f43809a56",
       "sol": "0x9d0d275efbd37d8a8855f6f2c761fa5983293dd8ce202ee5196626de8fcd4469",
       "btc": "0x9a62b4863bdeaabdc9500fce769cf7e72d5585eeb28a6d26e4cafadc13f76ab2",
-      "eth": "0x9193fd47f9a0ab99b6e365a464c8a9ae30e6150fc37ed2a89c1586631f6fc4ab"
+      "eth": "0x9193fd47f9a0ab99b6e365a464c8a9ae30e6150fc37ed2a89c1586631f6fc4ab",
+      "doge": "0xd59a5f5173424ba725a7d033d86f2eadf2745f87a908bd27e1d27339eff598ce",
+      "xrp": "0x93bfda25cb6b1653a9c769e8216014bd2c06997f3edb479566761fbf2abf6ac2"
     }
   },
   "coins": {
@@ -451,6 +505,16 @@
       "decimals": 8,
       "module": "0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN",
       "metadata": "0x4d2c39082b4477e3e79dc4562d939147ab90c42fc5f3e4acf03b94383cd69b6e"
+    },
+    "xrp": {
+      "decimals": 6,
+      "module": "0x8592d41b28815030c40cae43bf30a3f75657e57e6028a05c1b56e5f236b1416e::xrp::XRP",
+      "metadata": "0x69004e9f9a4981fdee2f3050cf99c7d2f2a7e45b871da2cc056a850e6bf818b3"
+    },
+    "doge": {
+      "decimals": 8,
+      "module": "0xe364a361406e7ab4ea4ec17cc4840b18737dd20bd7124a82130aa21422b8fc20::doge::DOGE",
+      "metadata": "0xf3da270f549dd26d1d2dd251961d46919d3abb3044a98ef0fd7dd914d3cc9159"
     }
   }
 }
