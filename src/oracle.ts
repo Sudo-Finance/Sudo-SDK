@@ -51,9 +51,11 @@ export class OracleAPI {
 
   async getOraclePrices(tokens: string[]) {
     const connection = new SuiPriceServiceConnection(this.connectionURL);
-    const pythObjectIds = tokens.map(
+    let pythObjectIds = tokens.map(
       token => this.consts.pythFeeder.feeder[token],
     );
+    // remove dupe object ids
+    pythObjectIds = [...new Set(pythObjectIds)];
     const priceFeedIds = pythObjectIds.map(
       pythObjectId => this.PythFeederToPriceId[pythObjectId],
     );
@@ -67,9 +69,11 @@ export class OracleAPI {
   ) {
     const connection = new SuiPriceServiceConnection(this.connectionURL);
 
-    const pythObjectIds = tokens.map(
+    let pythObjectIds = tokens.map(
       token => this.consts.pythFeeder.feeder[token],
     );
+    // remove dupe object ids
+    pythObjectIds = [...new Set(pythObjectIds)];
     const priceFeedIds = pythObjectIds
       .map(pythObjectId => this.PythFeederToPriceId[pythObjectId])
       .filter(p => p !== undefined);
@@ -85,9 +89,12 @@ export class OracleAPI {
     // Remove redundant tokens first
     tokens = [...new Set(tokens)];
 
-    const pythObjectIds = tokens.map(
+    let pythObjectIds = tokens.map(
       token => this.consts.pythFeeder.feeder[token],
     );
+    // remove dupe object ids
+    pythObjectIds = [...new Set(pythObjectIds)];
+
     const needUpdateObjectIds = (
       await this.provider.multiGetObjects({
         ids: pythObjectIds,
@@ -115,8 +122,9 @@ export class OracleAPI {
 
     const connection = new SuiPriceServiceConnection(this.connectionURL); // See Hermes endpoints section below for other endpoints
 
-    const priceUpdateData =
-      await connection.getPriceFeedsUpdateData(priceFeedIds);
+    const priceUpdateData = await connection.getPriceFeedsUpdateData(
+      priceFeedIds,
+    );
 
     const client = new SuiPythClient(
       this.provider,
