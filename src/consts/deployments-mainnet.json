@@ -18,7 +18,7 @@
         "reserving_fee_model": "0x06420378d3b4bdba8d5afc2f88d33b7c7640aa14330c35f14c9874289147f15b"
       },
       "usdc": {
-        "weight": "150000000000000000",
+        "weight": "50000000000000000",
         "reserving_fee_model": "0x75183cd63566bf3ef9c5d1ec790a28e5b0a75a0901a33b48e1e8423a62a6eb9d"
       },
       "usdt": {
@@ -42,8 +42,20 @@
         "reserving_fee_model": "0xc02cbd95ebb56e13fe6cb0ec49ddf2bebf7655cbca18f1e063bc1e1df8ceb6ea"
       },
       "buck": {
-        "weight": "100000000000000000",
+        "weight": "50000000000000000",
         "reserving_fee_model": "0xb5bfc5231b21059123fd4c0bdb39af025ec3025683d43fe23e05cf792bcbc8b8"
+      },
+      "nusdc": {
+        "weight": "100000000000000000",
+        "reserving_fee_model": "0xc9f2c56c85589ce19d58a55097234df845fca075a902c4b912d36ba5d21b32de"
+      },
+      "suiEth": {
+        "weight": "50000000000000000",
+        "reserving_fee_model": "0xd0d0b5076dd61ff70205a2f38d3abc6d18974b0ef524bb2dc7631371b5090b8c"
+      },
+      "ausd": {
+        "weight": "50000000000000000",
+        "reserving_fee_model": "0xcf5fcdd8fc9d295f1d44ba68a0b74350fe8191ee6b367dfa8c103c5ebc6f80c0"
       }
     },
     "symbols": {
@@ -353,6 +365,7 @@
     "feeder": {
       "sui": "0x801dbc2f0053d34734814b2d6df491ce7807a725fe9a01ad74a07e9c51396c37",
       "usdc": "0x5dec622733a204ca27f5a90d8c2fad453cc6665186fd5dff13a83d0b6c9027ab",
+      "nusdc": "0x5dec622733a204ca27f5a90d8c2fad453cc6665186fd5dff13a83d0b6c9027ab",
       "usdt": "0x985e3db9f93f76ee8bace7c3dd5cc676a096accd5d9e09e9ae0fb6e492b14572",
       "tsla": "0x0cd04841630005acd2dc69327d727bd2e0beec93864192c2df8b21be5e83d176",
       "cetus": "0x24c0247fb22457a719efac7f670cdc79be321b521460bd6bd2ccfa9f80713b14",
@@ -376,8 +389,10 @@
       "sol": "0x9d0d275efbd37d8a8855f6f2c761fa5983293dd8ce202ee5196626de8fcd4469",
       "btc": "0x9a62b4863bdeaabdc9500fce769cf7e72d5585eeb28a6d26e4cafadc13f76ab2",
       "eth": "0x9193fd47f9a0ab99b6e365a464c8a9ae30e6150fc37ed2a89c1586631f6fc4ab",
+      "suiEth": "0x9193fd47f9a0ab99b6e365a464c8a9ae30e6150fc37ed2a89c1586631f6fc4ab",
       "doge": "0xd59a5f5173424ba725a7d033d86f2eadf2745f87a908bd27e1d27339eff598ce",
-      "xrp": "0x93bfda25cb6b1653a9c769e8216014bd2c06997f3edb479566761fbf2abf6ac2"
+      "xrp": "0x93bfda25cb6b1653a9c769e8216014bd2c06997f3edb479566761fbf2abf6ac2",
+      "ausd": "0x94ef89923e7beccd4a52043a9451a87c614684b847426fb5fd76faa8cb1e907f"
     }
   },
   "coins": {
@@ -515,6 +530,21 @@
       "decimals": 8,
       "module": "0xe364a361406e7ab4ea4ec17cc4840b18737dd20bd7124a82130aa21422b8fc20::doge::DOGE",
       "metadata": "0xf3da270f549dd26d1d2dd251961d46919d3abb3044a98ef0fd7dd914d3cc9159"
+    },
+    "nusdc": {
+      "decimals": 6,
+      "module": "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
+      "metadata": "0x69b7a7c3c200439c1b5f3b19d7d495d5966d5f08de66c69276152f8db3992ec6"
+    },
+    "suiEth": {
+      "decimals": 8,
+      "module": "0xd0e89b2af5e4910726fbcd8b8dd37bb79b29e5f83f7491bca830e94f7f226d29::eth::ETH",
+      "metadata": "0x89b04ba87f8832d4d76e17a1c9dce72eb3e64d372cf02012b8d2de5384faeef0"
+    },
+    "ausd": {
+      "decimals": 6,
+      "module": "0x2053d08c1e2bd02791056171aab0fd12bd7cd7efad2ab8f6b9c8902f14df2ff2::ausd::AUSD",
+      "metadata": "0xc72215e72d16005840180ca3b26f20c9ca3c59d6516c8eea9846e8aa8ce9d6b5"
     }
   }
 }
