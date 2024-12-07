@@ -63,11 +63,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xfca5656fb055235a5670c6533d75193f486f76d1fa6bb1655a590a7ef7fb5e79",
         "position_config": "0x1911325bf0d031485947d4c514778806e910c72eb7ac53f9bb880686030c65f6"
@@ -76,14 +80,52 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x0cdcd3770b05bce4cedecd85486b9f8cbe497dc4ccb9bb10c98d5c72a9ce47c2",
         "position_config": "0x99746d72c16c038512a5de734242dceeee31f3603440e53b3cb1ae0122f4d932"
+      },
+      "long_fud": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0xa9f2cd68e60ff38d96fdb5bd674ec34c0ece26258e4da863f18791d814890f05",
+        "position_config": "0x71cf3437004870c732c3fd4cac963e74636c342ada6bb387183fefacd6a7ed19"
+      },
+      "short_fud": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0x7c5ea90c10bd09d328740c35183421e02498ddcaac7e5aeee2b7b01eef22ed2f",
+        "position_config": "0x9abbaee4afe1246cb4e3d119ce997ce23b6a450eedf29bae3211bf69c1b0b9d3"
       },
       "long_cetus": {
         "supported_collaterals": [
@@ -102,11 +144,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x30d830d4f3dd25529f80721f60f07c647882c67c1d967aa287fbd7eb83f3c7b7",
         "position_config": "0xbf0ea4cb5e24de215cb83a76fff3f0071e34f916f89f70ca1cd0943f818e632e"
@@ -115,11 +161,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xd40e97ca54532dca8900f35bae605647c2454692303a24c47b3a8abca93f3b75",
         "position_config": "0x107e78adbafec5ebd0a45ca4b857335c93c161a5cf7a373019f887852e5af12e"
@@ -128,11 +178,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xe926a54f0a69679fb79f5174cdb8c6d1b343fb7671ae6ecd2462314bbc025753",
         "position_config": "0x2c14a29fef2405b1f04e353a7e7150f070e604df73a75fce8255a00dec9dab86"
@@ -141,11 +195,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xd4ded49575b966652eee2947a4078df56babfb66cc27bb8a248dbac714e2d49c",
         "position_config": "0xac9e8e53906e51d0ba286a4db8ee2a2a4c7c50c3b1689fabacb32482aa2ef54c"
@@ -154,38 +212,18 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x4bafb53187f78ff6ead25f0507c4c071a0502ac74366aa03dd49fc13edf5177b",
         "position_config": "0xb22a5641631cb41ee1965b569a84a38490c5b7920ffc0e50bf814c6dea2b9188"
-      },
-      "long_fud": {
-        "supported_collaterals": [
-          "sui",
-          "usdt",
-          "usdc",
-          "vSui",
-          "fud",
-          "afSui"
-        ],
-        "funding_fee_model": "0xa9f2cd68e60ff38d96fdb5bd674ec34c0ece26258e4da863f18791d814890f05",
-        "position_config": "0x71cf3437004870c732c3fd4cac963e74636c342ada6bb387183fefacd6a7ed19"
-      },
-      "short_fud": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "vSui",
-          "usdt",
-          "fud",
-          "afSui"
-        ],
-        "funding_fee_model": "0x7c5ea90c10bd09d328740c35183421e02498ddcaac7e5aeee2b7b01eef22ed2f",
-        "position_config": "0x9abbaee4afe1246cb4e3d119ce997ce23b6a450eedf29bae3211bf69c1b0b9d3"
       },
       "long_btc": {
         "supported_collaterals": [
@@ -195,7 +233,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xe069554aaa52d9c817cff69e694ad260db166402f6b2e2c34e2ddc32a3f517ab",
         "position_config": "0x05dcc85ccb2373769daf609222b6c5e9c9e044ee9cf06c693b3d52706d9e353a"
@@ -208,7 +250,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x858c25a2cd835af80fbadf4038bd921920980d9dfa46284fb7290222e3226d8e",
         "position_config": "0x8a2b02a9c5f83b575a5ead5a384e0c03dd6d0dc4be66eeffa72cdbf05595354a"
@@ -221,7 +267,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x86ddf1808299e47d830dcada590549634ec500ac16a44c11bf3ff71554dd32bd",
         "position_config": "0xb77069624c1bd4490796a3845d9b38e71fbd18c2466cee150f4f7994c499fdf2"
@@ -234,7 +284,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xdf83227866bf9909ef4f8e68cd10c486f46bf4095a7f6dc068e4904d57b13628",
         "position_config": "0x65a1fadd23a517677d1b5c8d9011c3491d8ca063b692b4a5f0f196f27f6f566c"
@@ -247,7 +301,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x7fe12e9a885145aef1f9455690eb36431a0b661aebcb10eb83f75a3d6f16a8cb",
         "position_config": "0xe5c13e22f55070f7b766ac02ddc897829dd911189654cdb4bcce0351e751cfc6"
@@ -260,7 +318,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xa32e3d38ec21a3d6784f93c532813b0054efcc25055daa30351048629f31c59f",
         "position_config": "0x14cb89dadf7cd1f80de22a2e6a29b2742be9775d6303d42dc1c900bb5fd68106"
@@ -273,7 +335,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x81fd517288729b3037ef72e91ca81113a6eae0a22a55b3eb47391bc190d98cd6",
         "position_config": "0xc9dc75c9f6b85cd06764b828d3c462757a606efc3f0553018e2894af2fd239db"
@@ -286,7 +352,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x532bc45f86c887bf4523ee6b29df3ecc88ed3217cdafe68c5c9473de03f2a7a3",
         "position_config": "0x0315fa104d694b9289e8887e4f60fad3e22264918560a9a5d26d60c9d3b9fa41"
@@ -299,7 +369,11 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xc8726ab06b575a2c7c1c6d089867e512b6816ea1288a1fd54d40628ca17b410c",
         "position_config": "0x23cdf63650b81ca8756e429bc01d20607d9171476be47dcf5710366b1e06808e"
@@ -312,18 +386,46 @@
           "afSui",
           "fud",
           "vSui",
-          "navx"
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x2061d0cdd96612a7d5dc81b9d0cfee8820a056ce351294750cdf44d1d1a32aa6",
         "position_config": "0x23dec742fab6f4b7de4668eabd7daf3dae4e59c790ffef3f709cd0a3cdfc0914"
       },
       "long_navx": {
-        "supported_collaterals": ["sui", "usdc", "navx"],
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
         "funding_fee_model": "0xf08d2abe94ce63f08e2ef59eaccd0796e4f6044b77cc555feb3e4570429d28cb",
         "position_config": "0x57f26c5e576ae860acb17e8e5639ad31262d463ef62a5f5703853a14008fdfa2"
       },
       "short_navx": {
-        "supported_collaterals": ["sui", "usdc", "navx"],
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
         "funding_fee_model": "0xd652a240b6cb424bdf848293beee6fdb2e1f67f52cca0595b2a10d82aedb3535",
         "position_config": "0xf8f22efa91b4e78ab458a7122bd394b9a177fb43ed26cfb3c1f27d3b7ac69ddd"
       },
@@ -331,11 +433,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0xd8d604c139189f8091f4c2570228759c189019c6b4c5703e36136d9c810478ee",
         "position_config": "0xdbf5cbb616466e8a1075eaec0a761d27820ebf87af084f50b1e1225bc27814f8"
@@ -344,11 +450,15 @@
         "supported_collaterals": [
           "sui",
           "usdc",
-          "navx",
           "usdt",
-          "vSui",
+          "afSui",
           "fud",
-          "afSui"
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
         ],
         "funding_fee_model": "0x65132effa376785b8259b5679093bd6b425b0a252416ca133bfb53cdef75f5f7",
         "position_config": "0xabe745b40968d1b8ad8347c5c64973a70e6e5e51701de561c5dd763118b15e8e"
