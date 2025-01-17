@@ -546,5 +546,12 @@
       "module": "0x2053d08c1e2bd02791056171aab0fd12bd7cd7efad2ab8f6b9c8902f14df2ff2::ausd::AUSD",
       "metadata": "0xc72215e72d16005840180ca3b26f20c9ca3c59d6516c8eea9846e8aa8ce9d6b5"
     }
+  },
+  "sudo_staking": {
+    "package": "",
+    "upgraded_package": "",
+    "upgrade_cap": "",
+    "admin_cap": "",
+    "slp_staking_pool": ""
   }
 }
