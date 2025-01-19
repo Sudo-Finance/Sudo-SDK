@@ -93,24 +93,41 @@
         "funding_fee_model": "0x0cdcd3770b05bce4cedecd85486b9f8cbe497dc4ccb9bb10c98d5c72a9ce47c2",
         "position_config": "0x99746d72c16c038512a5de734242dceeee31f3603440e53b3cb1ae0122f4d932"
       },
-      "long_fud": {
+      "long_trump": {
         "supported_collaterals": [
           "sui",
           "usdc",
-          "usdt",
-          "afSui",
-          "fud",
-          "vSui",
           "navx",
+          "usdt",
+          "vSui",
+          "fud",
+          "afSui",
           "buck",
           "nusdc",
           "suiEth",
           "ausd"
         ],
-        "funding_fee_model": "0xa9f2cd68e60ff38d96fdb5bd674ec34c0ece26258e4da863f18791d814890f05",
-        "position_config": "0x71cf3437004870c732c3fd4cac963e74636c342ada6bb387183fefacd6a7ed19"
+        "funding_fee_model": "0x97f92c752dbb613e46cf0458a250ffce14106824a57605eaf66cf111be69efef",
+        "position_config": "0xb5b04ac4c2e3859d69ea5081c4e2fd0263fef2acdc11b986b42c6fc06e5f9ae1"
       },
-      "short_fud": {
+      "short_trump": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "navx",
+          "usdt",
+          "vSui",
+          "fud",
+          "afSui",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0xa6c1356036e0775c5c2761acdcf14a283f386a3343c250d13c279700658b1075",
+        "position_config": "0x3fe5640be854148b6fa3610c3f3a4369ea26cd1370f355c753134e0ddc0d7d0d"
+      },
+      "long_deep": {
         "supported_collaterals": [
           "sui",
           "usdc",
@@ -119,13 +136,30 @@
           "fud",
           "vSui",
           "navx",
-          "buck",
+          "ausd",
           "nusdc",
           "suiEth",
-          "ausd"
+          "buck"
         ],
-        "funding_fee_model": "0x7c5ea90c10bd09d328740c35183421e02498ddcaac7e5aeee2b7b01eef22ed2f",
-        "position_config": "0x9abbaee4afe1246cb4e3d119ce997ce23b6a450eedf29bae3211bf69c1b0b9d3"
+        "funding_fee_model": "0x7e4e81e65ef4b8e1980a2ae74988ebfb7fa10a8b8620b209cc3f1b1fd3e8b88a",
+        "position_config": "0xfdd441c5241259fce23ad697eae93b0451d1dce3e8488e32cac4b60a27cf067d"
+      },
+      "short_deep": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "ausd",
+          "nusdc",
+          "suiEth",
+          "buck"
+        ],
+        "funding_fee_model": "0x0bbec3552918ee8a0da44c75235cfc801e84e6871e7eb8356d2989b709cdeea0",
+        "position_config": "0x48c3ffce25bdebefffc61fce92add205106e28515ef10b9ece46405edb6be39d"
       },
       "long_cetus": {
         "supported_collaterals": [
@@ -395,6 +429,40 @@
         "funding_fee_model": "0x2061d0cdd96612a7d5dc81b9d0cfee8820a056ce351294750cdf44d1d1a32aa6",
         "position_config": "0x23dec742fab6f4b7de4668eabd7daf3dae4e59c790ffef3f709cd0a3cdfc0914"
       },
+      "long_fud": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0xa9f2cd68e60ff38d96fdb5bd674ec34c0ece26258e4da863f18791d814890f05",
+        "position_config": "0x71cf3437004870c732c3fd4cac963e74636c342ada6bb387183fefacd6a7ed19"
+      },
+      "short_fud": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0x7c5ea90c10bd09d328740c35183421e02498ddcaac7e5aeee2b7b01eef22ed2f",
+        "position_config": "0x9abbaee4afe1246cb4e3d119ce997ce23b6a450eedf29bae3211bf69c1b0b9d3"
+      },
       "long_navx": {
         "supported_collaterals": [
           "sui",
@@ -502,7 +570,9 @@
       "suiEth": "0x9193fd47f9a0ab99b6e365a464c8a9ae30e6150fc37ed2a89c1586631f6fc4ab",
       "doge": "0xd59a5f5173424ba725a7d033d86f2eadf2745f87a908bd27e1d27339eff598ce",
       "xrp": "0x93bfda25cb6b1653a9c769e8216014bd2c06997f3edb479566761fbf2abf6ac2",
-      "ausd": "0x94ef89923e7beccd4a52043a9451a87c614684b847426fb5fd76faa8cb1e907f"
+      "ausd": "0x94ef89923e7beccd4a52043a9451a87c614684b847426fb5fd76faa8cb1e907f",
+      "deep": "0x8c7f3a322b94cc69db2a2ac575cbd94bf5766113324c3a3eceac91e3e88a51ed",
+      "trump": "0xd0835474be8cfcc7be4e02fc1bcd85dbdf11a54d061edc302e611ca304f57b14"
     }
   },
   "coins": {
@@ -655,6 +725,16 @@
       "decimals": 6,
       "module": "0x2053d08c1e2bd02791056171aab0fd12bd7cd7efad2ab8f6b9c8902f14df2ff2::ausd::AUSD",
       "metadata": "0xc72215e72d16005840180ca3b26f20c9ca3c59d6516c8eea9846e8aa8ce9d6b5"
+    },
+    "deep": {
+      "decimals": 6,
+      "module": "0xdeeb7a4662eec9f2f3def03fb937a663dddaa2e215b8078a284d026b7946c270::deep::DEEP",
+      "metadata": "0x6e60b051a08fa836f5a7acd7c464c8d9825bc29c44657fe170fe9b8e1e4770c0"
+    },
+    "trump": {
+      "decimals": 6,
+      "module": "0xbac9a286efdb3520c76c2cbff789ad42c0834c857c3a249915b10d8b5bf8afac::trump::TRUMP",
+      "metadata": "0xdea3d7c4b12833a89edd5f04921e800a6e34f9e8256dc514979855d5084212ba"
     }
   }
 }
