@@ -127,6 +127,40 @@
         "funding_fee_model": "0xa6c1356036e0775c5c2761acdcf14a283f386a3343c250d13c279700658b1075",
         "position_config": "0x3fe5640be854148b6fa3610c3f3a4369ea26cd1370f355c753134e0ddc0d7d0d"
       },
+      "long_melania": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0xe3aefd7a6f1a6f33a0b629f91e07eb0ba0cb32152fbfc3b1d35175b11fe05d36",
+        "position_config": "0x98c55e78e933b28158ddcfbc5972328bc83af0b4f0ae8d5d29e77fc870d3fe4b"
+      },
+      "short_melania": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "fud",
+          "vSui",
+          "navx",
+          "buck",
+          "nusdc",
+          "suiEth",
+          "ausd"
+        ],
+        "funding_fee_model": "0x73a7da50341159df6d9be7b1946c38759592903aeb261731c0049fb31b9ca5e8",
+        "position_config": "0x663297043e457310ac36f827a99dcb97adc14616a361c12643e89b74883f6f87"
+      },
       "long_deep": {
         "supported_collaterals": [
           "sui",
@@ -572,7 +606,8 @@
       "xrp": "0x93bfda25cb6b1653a9c769e8216014bd2c06997f3edb479566761fbf2abf6ac2",
       "ausd": "0x94ef89923e7beccd4a52043a9451a87c614684b847426fb5fd76faa8cb1e907f",
       "deep": "0x8c7f3a322b94cc69db2a2ac575cbd94bf5766113324c3a3eceac91e3e88a51ed",
-      "trump": "0xd0835474be8cfcc7be4e02fc1bcd85dbdf11a54d061edc302e611ca304f57b14"
+      "trump": "0xd0835474be8cfcc7be4e02fc1bcd85dbdf11a54d061edc302e611ca304f57b14",
+      "melania": "0x5703251a050084aa309e7c4e3e09e2f3817e9d419aeb65b362acd8db6ea3f5d7"
     }
   },
   "coins": {
@@ -735,6 +770,11 @@
       "decimals": 6,
       "module": "0xbac9a286efdb3520c76c2cbff789ad42c0834c857c3a249915b10d8b5bf8afac::trump::TRUMP",
       "metadata": "0xdea3d7c4b12833a89edd5f04921e800a6e34f9e8256dc514979855d5084212ba"
+    },
+    "melania": {
+      "decimals": 6,
+      "module": "0x4fd81bee7b8e550aa25f8cceef1e29dc7390b2bf318e262509586a4a534c648e::melania::MELANIA",
+      "metadata": "0xe21acd598f6f4275d961e2712493127cab7697f4bc04066385d021221ffb061f"
     }
   }
 }
