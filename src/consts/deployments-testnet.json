@@ -91,5 +91,13 @@
       "metadata": "0x74510ee3cd8dcb8bd02822c72bb16f09d8f1a8a1e4dcb209d5842766d061098d",
       "treasury": "0xa8bbd635eb3714768d55a32f157d8fee62f512ceb4704177a25148f3de464379"
     }
+  },
+  "sudo_staking": {
+    "package": "0x47dbe62da0e0b758b204d0334208abdac19ef93bd857f50da24a653aa085d191",
+    "upgrade_cap": "0x47dbe62da0e0b758b204d0334208abdac19ef93bd857f50da24a653aa085d191",
+    "admin_cap": "0x8a9fbda8da6a31ecfe2aa4bb0b845ae45405b6b7daf395f42fa950207b69e621",
+    "pools": [
+      "0xa62517ca325b91b26d00c8e600f18a5ff930ff859a621c31a513e287ee472c39"
+    ]
   }
 }

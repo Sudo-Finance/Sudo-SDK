@@ -54,6 +54,13 @@ export interface IConsts {
     referralsParent: string;
     ordersParent: string;
   };
+  sudoStaking: {
+    package: string;
+    upgradedPackage: string;
+    upgradeCap: string;
+    adminCap: string;
+    pools: string[];
+  };
   sudoNft: {
     package: string;
     upgradedPackage: string;

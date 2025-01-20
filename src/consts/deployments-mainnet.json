@@ -776,5 +776,12 @@
       "module": "0x4fd81bee7b8e550aa25f8cceef1e29dc7390b2bf318e262509586a4a534c648e::melania::MELANIA",
       "metadata": "0xe21acd598f6f4275d961e2712493127cab7697f4bc04066385d021221ffb061f"
     }
+  },
+  "sudo_staking": {
+    "package": "",
+    "upgraded_package": "",
+    "upgrade_cap": "",
+    "admin_cap": "",
+    "pools": ["0xc807ff29756975932bd7dcbda425fb7d896bc9fa69f8c89421defedf4a54fcd6"]
   }
 }
