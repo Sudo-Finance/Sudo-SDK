@@ -59,7 +59,7 @@ export interface IConsts {
     upgradedPackage: string;
     upgradeCap: string;
     adminCap: string;
-    slpStakingPool: string;
+    pools: string[];
   };
   sudoNft: {
     package: string;
