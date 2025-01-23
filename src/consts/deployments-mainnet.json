@@ -782,6 +782,6 @@
     "upgraded_package": "",
     "upgrade_cap": "",
     "admin_cap": "",
-    "pools": ["0xc807ff29756975932bd7dcbda425fb7d896bc9fa69f8c89421defedf4a54fcd6"]
+    "pool": ""
   }
 }
