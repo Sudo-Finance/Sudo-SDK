@@ -778,10 +778,10 @@
     }
   },
   "sudo_staking": {
-    "package": "",
-    "upgraded_package": "",
-    "upgrade_cap": "",
-    "admin_cap": "",
-    "pool": ""
+    "package": "0xbc709293d6cce79e78c2725cfb340f643fc118603e895d0075e2fe02f59d1fb0",
+    "upgraded_package": "0xbc709293d6cce79e78c2725cfb340f643fc118603e895d0075e2fe02f59d1fb0",
+    "upgrade_cap": "0xc6d91a6ef4e7a1241f3912dc1df7c568a6ac4489a29c158ff2687ad5b80a2f1b",
+    "admin_cap": "0xc5f3788a2e8d8f466d13423b9fec460a35130e0daeaef86b509aa2556d4ced52",
+    "pool": "0x14587a366da17ab24ecf5b01cfc52484aab63609b44041202936551049011288"
   }
 }
