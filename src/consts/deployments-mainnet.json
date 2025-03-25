@@ -93,36 +93,6 @@
         "funding_fee_model": "0x0cdcd3770b05bce4cedecd85486b9f8cbe497dc4ccb9bb10c98d5c72a9ce47c2",
         "position_config": "0x99746d72c16c038512a5de734242dceeee31f3603440e53b3cb1ae0122f4d932"
       },
-      "long_wal": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "usdt",
-          "afSui",
-          "vSui",
-          "ausd",
-          "nusdc",
-          "suiEth",
-          "buck"
-        ],
-        "funding_fee_model": "0x983436efba787241c2cf7be6e1d0313ffd88cad041733c3b01b811cd65cd8400",
-        "position_config": "0xdb40c054caf7557a9e2011831010f42c8b0eead10cc04ce6de7cebeea2e7583a"
-      },
-      "short_wal": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "usdt",
-          "afSui",
-          "vSui",
-          "ausd",
-          "nusdc",
-          "suiEth",
-          "buck"
-        ],
-        "funding_fee_model": "0x36355c52ffb32f6f807f7f92792b88d6d4aca6403f4754a356aeb4b5f61ce224",
-        "position_config": "0x9bcd7040b62a9b7e74b7961d49f47ae4f798a496560e9b0558e532f3cc9e1f8f"
-      },
       "long_trump": {
         "supported_collaterals": [
           "sui",
@@ -560,40 +530,6 @@
         ],
         "funding_fee_model": "0x2061d0cdd96612a7d5dc81b9d0cfee8820a056ce351294750cdf44d1d1a32aa6",
         "position_config": "0x23dec742fab6f4b7de4668eabd7daf3dae4e59c790ffef3f709cd0a3cdfc0914"
-      },
-      "long_fud": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "usdt",
-          "afSui",
-          "fud",
-          "vSui",
-          "navx",
-          "buck",
-          "nusdc",
-          "suiEth",
-          "ausd"
-        ],
-        "funding_fee_model": "0xa9f2cd68e60ff38d96fdb5bd674ec34c0ece26258e4da863f18791d814890f05",
-        "position_config": "0x71cf3437004870c732c3fd4cac963e74636c342ada6bb387183fefacd6a7ed19"
-      },
-      "short_fud": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "usdt",
-          "afSui",
-          "fud",
-          "vSui",
-          "navx",
-          "buck",
-          "nusdc",
-          "suiEth",
-          "ausd"
-        ],
-        "funding_fee_model": "0x7c5ea90c10bd09d328740c35183421e02498ddcaac7e5aeee2b7b01eef22ed2f",
-        "position_config": "0x9abbaee4afe1246cb4e3d119ce997ce23b6a450eedf29bae3211bf69c1b0b9d3"
       },
       "long_navx": {
         "supported_collaterals": [
