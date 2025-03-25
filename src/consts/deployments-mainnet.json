@@ -93,6 +93,36 @@
         "funding_fee_model": "0x0cdcd3770b05bce4cedecd85486b9f8cbe497dc4ccb9bb10c98d5c72a9ce47c2",
         "position_config": "0x99746d72c16c038512a5de734242dceeee31f3603440e53b3cb1ae0122f4d932"
       },
+      "long_wal": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "vSui",
+          "ausd",
+          "nusdc",
+          "suiEth",
+          "buck"
+        ],
+        "funding_fee_model": "0x983436efba787241c2cf7be6e1d0313ffd88cad041733c3b01b811cd65cd8400",
+        "position_config": "0xdb40c054caf7557a9e2011831010f42c8b0eead10cc04ce6de7cebeea2e7583a"
+      },
+      "short_wal": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "vSui",
+          "ausd",
+          "nusdc",
+          "suiEth",
+          "buck"
+        ],
+        "funding_fee_model": "0x36355c52ffb32f6f807f7f92792b88d6d4aca6403f4754a356aeb4b5f61ce224",
+        "position_config": "0x9bcd7040b62a9b7e74b7961d49f47ae4f798a496560e9b0558e532f3cc9e1f8f"
+      },
       "long_trump": {
         "supported_collaterals": [
           "sui",
@@ -677,7 +707,8 @@
       "trump": "0xd0835474be8cfcc7be4e02fc1bcd85dbdf11a54d061edc302e611ca304f57b14",
       "melania": "0x5703251a050084aa309e7c4e3e09e2f3817e9d419aeb65b362acd8db6ea3f5d7",
       "aptos": "0x7c5b7837c44a69b469325463ac0673ac1aa8435ff44ddb4191c9ae380463647f",
-      "ns": "0xc6352e1ea55d7b5acc3ed690cc3cdf8007978071d7bfd6a189445018cfb366e0"
+      "ns": "0xc6352e1ea55d7b5acc3ed690cc3cdf8007978071d7bfd6a189445018cfb366e0",
+      "wal": "0xeb7e669f74d976c0b99b6ef9801e3a77716a95f1a15754e0f1399ce3fb60973d"
     }
   },
   "coins": {
@@ -855,6 +886,11 @@
       "decimals": 8,
       "module": "0x3a5143bb1196e3bcdfab6203d1683ae29edd26294fc8bfeafe4aaa9d2704df37::coin::COIN",
       "metadata": "0xc969c5251f372c0f34c32759f1d315cf1ea0ee5e4454b52aea08778eacfdd0a8"
+    },
+    "wal": {
+      "decimals": 9,
+      "module": "0x356a26eb9e012a68958082340d4c4116e7f55615cf27affcff209cf0ae544f59::wal::WAL",
+      "metadata": "0xcf8a31804ae40cb3e7183fe57320f87467a7750d4fa701bca1ffbb1edd37781e"
     }
   },
   "sudo_staking": {
