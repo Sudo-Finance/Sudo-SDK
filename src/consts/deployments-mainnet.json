@@ -93,6 +93,36 @@
         "funding_fee_model": "0x0cdcd3770b05bce4cedecd85486b9f8cbe497dc4ccb9bb10c98d5c72a9ce47c2",
         "position_config": "0x99746d72c16c038512a5de734242dceeee31f3603440e53b3cb1ae0122f4d932"
       },
+      "long_wal": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "vSui",
+          "ausd",
+          "nusdc",
+          "suiEth",
+          "buck"
+        ],
+        "funding_fee_model": "0xe791e2f0a51e16ca94f179c26409eedcd6c8e61af8dec9a2066899b70ce008d5",
+        "position_config": "0x9bd3ae161812d66308a2d8a60c0252dca97a81717775fa61ef162478901317d7"
+      },
+      "short_wal": {
+        "supported_collaterals": [
+          "sui",
+          "usdc",
+          "usdt",
+          "afSui",
+          "vSui",
+          "ausd",
+          "nusdc",
+          "suiEth",
+          "buck"
+        ],
+        "funding_fee_model": "0xf1bba3ed3493865a47e4c6a2bbcc381bdccf1bcf3dac5c58cfe1c4fa0c2361ff",
+        "position_config": "0xb349e22dcf00fc27703ff50a14379e4786d287ef047685911f565762322887b1"
+      },
       "long_trump": {
         "supported_collaterals": [
           "sui",
