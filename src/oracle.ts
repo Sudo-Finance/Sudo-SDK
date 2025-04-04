@@ -55,7 +55,7 @@ export class OracleAPI {
       token => this.consts.pythFeeder.feeder[token],
     );
     // remove dupe object ids
-    pythObjectIds = [...new Set(pythObjectIds)];
+    pythObjectIds = [...new Set(pythObjectIds)].filter(Boolean);
     const priceFeedIds = pythObjectIds.map(
       pythObjectId => this.PythFeederToPriceId[pythObjectId],
     );
@@ -73,7 +73,7 @@ export class OracleAPI {
       token => this.consts.pythFeeder.feeder[token],
     );
     // remove dupe object ids
-    pythObjectIds = [...new Set(pythObjectIds)];
+    pythObjectIds = [...new Set(pythObjectIds)].filter(Boolean);
     const priceFeedIds = pythObjectIds
       .map(pythObjectId => this.PythFeederToPriceId[pythObjectId])
       .filter(p => p !== undefined);
@@ -93,7 +93,7 @@ export class OracleAPI {
       token => this.consts.pythFeeder.feeder[token],
     );
     // remove dupe object ids
-    pythObjectIds = [...new Set(pythObjectIds)];
+    pythObjectIds = [...new Set(pythObjectIds)].filter(Boolean);
 
     const needUpdateObjectIds = (
       await this.provider.multiGetObjects({
