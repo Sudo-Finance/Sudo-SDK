@@ -1,5 +1,3 @@
-import { BCS } from '@mysten/bcs';
-import { bcs } from './bcs';
 import { SLP_TOKEN_DECIMALS } from './consts';
 import {
   decimalToObject,
@@ -14,6 +12,7 @@ import { Transaction } from '@mysten/sui/transactions';
 import { SuiClient } from '@mysten/sui/client';
 import { OracleAPI } from './oracle';
 import { parsePosition } from './parser';
+import { Decimal, SDecimal, SRate, VaultsValuation, SymbolsValuation, Rate } from './bcs';
 
 export interface IMarketInfo {
   lpSupply: string;
@@ -731,26 +730,24 @@ export class SudoDataAPI extends OracleAPI {
     const symbolsValuationOffset =
       Object.keys(this.consts.sudoCore.symbols).length + 1;
 
-    const vaultsValuation = bcs.de(
-      'VaultsValuation',
-      new Uint8Array(
-        (
-          (res.results as any)[
-            (res.results?.length || 0) - symbolsValuationOffset - 1
-          ].mutableReferenceOutputs as any
-        )[1][1],
-      ),
-    );
+      const vaultsValuation = VaultsValuation.parse(
+        new Uint8Array(
+          (
+            (res.results as any)[
+              (res.results?.length || 0) - symbolsValuationOffset - 1
+            ].mutableReferenceOutputs as any
+          )[1][1],
+        ),
+      );
 
-    const symbolsValuation = bcs.de(
-      'SymbolsValuation',
-      new Uint8Array(
-        (
-          (res.results as any)[(res.results?.length || 0) - 1]
-            .mutableReferenceOutputs as any
-        )[1][1],
-      ),
-    );
+      const symbolsValuation = SymbolsValuation.parse(
+        new Uint8Array(
+          (
+            (res.results as any)[(res.results?.length || 0) - 1]
+              .mutableReferenceOutputs as any
+          )[1][1],
+        ),
+      );
 
     const result =
       Number(
@@ -771,8 +768,7 @@ export class SudoDataAPI extends OracleAPI {
       transactionBlock: tx,
       sender,
     });
-    const vaultsValuation = bcs.de(
-      'VaultsValuation',
+    const vaultsValuation = VaultsValuation.parse(
       new Uint8Array(
         (
           (res.results as any)[(res.results?.length || 0) - 1]
@@ -780,6 +776,7 @@ export class SudoDataAPI extends OracleAPI {
         )[1][1],
       ),
     );
+
 
     const result = Number(BigInt(vaultsValuation.value)) / 1e18;
     return result;
@@ -845,8 +842,7 @@ export class SudoDataAPI extends OracleAPI {
       sender,
     });
 
-    const de = bcs.de(
-      'SRate',
+    const de = SRate.parse(
       new Uint8Array(res.results[res.results.length - 1].returnValues[0][0]),
     );
 
@@ -867,8 +863,7 @@ export class SudoDataAPI extends OracleAPI {
       transactionBlock: tx1,
       sender,
     });
-    const vaultsValuation = bcs.de(
-      'VaultsValuation',
+    const vaultsValuation = VaultsValuation.parse(
       new Uint8Array(
         (
           (res1.results as any)[(res1.results?.length || 0) - 1]
@@ -878,8 +873,9 @@ export class SudoDataAPI extends OracleAPI {
     );
     const singleVaultValue =
       BigInt(
+        // @ts-ignore
         vaultsValuation.handled.find((item: any) =>
-          item.key.includes(this.consts.coins[collateralToken].module.slice(2)),
+          (item.key || '').includes(this.consts.coins[collateralToken].module.slice(2)) || false,
         )?.value.value,
       ) + amount;
     const allVaultValue = BigInt(vaultsValuation.value) + amount;
@@ -903,8 +899,7 @@ export class SudoDataAPI extends OracleAPI {
       transactionBlock: tx2,
       sender,
     });
-    const de = bcs.de(
-      'Rate',
+    const de = Rate.parse(
       new Uint8Array(res2.results[res2.results.length - 1].returnValues[0][0]),
     );
     return Number(BigInt(de)) / 1e18;
@@ -943,8 +938,7 @@ export class SudoDataAPI extends OracleAPI {
       transactionBlock: tx,
       sender,
     });
-    const de = bcs.de(
-      'Rate',
+    const de = Rate.parse(
       new Uint8Array(res.results[res.results.length - 1].returnValues[0][0]),
     );
     return Number(BigInt(de)) / 1e18;
@@ -1005,8 +999,7 @@ export class SudoDataAPI extends OracleAPI {
       transactionBlock: tx,
       sender: position.owner,
     });
-    const de = bcs.de(
-      BCS.U256,
+    const de = Decimal.parse(
       new Uint8Array(res.results[res.results.length - 1].returnValues[0][0]),
     );
     return parseInt((Number(BigInt(de)) / 1e18).toFixed(0));
@@ -1101,8 +1094,7 @@ export class SudoDataAPI extends OracleAPI {
     if (res.error) {
       throw new Error(res.error);
     }
-    const de = bcs.de(
-      'SDecimal',
+    const de = SDecimal.parse(
       new Uint8Array(res.results[res.results.length - 1].returnValues[0][0]),
     );
     return (Number(BigInt(de.value)) * (de.is_positive ? 1 : -1)) / 1e18;

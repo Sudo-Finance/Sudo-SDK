@@ -1,53 +1,45 @@
-import { BCS, getSuiMoveConfig } from '@mysten/bcs';
-export const bcs = new BCS(getSuiMoveConfig());
+import { bcs } from '@mysten/bcs';
 
-//std
-bcs.registerAlias('TypeName', BCS.STRING);
+export const Rate = bcs.u128();
+export const Decimal = bcs.u256();
 
-// VecMap
-bcs.registerStructType(['Entry', 'K', 'V'], {
-  key: 'K',
-  value: 'V',
+export const SDecimal = bcs.struct('SDecimal', {
+  is_positive: bcs.bool(),
+  value: bcs.u256(),
 });
 
-// Math
-bcs.registerAlias('Decimal', BCS.U256);
-bcs.registerAlias('Rate', BCS.U128);
-
-bcs.registerStructType('SDecimal', {
-  is_positive: BCS.BOOL,
-  value: 'Decimal',
-});
-
-bcs.registerStructType('SRate', {
-  is_positive: BCS.BOOL,
-  value: 'Rate',
+export const SRate = bcs.struct('SRate', {
+  is_positive: bcs.bool(),
+  value: bcs.u128(),
 });
 
 // Agg price
-bcs.registerStructType('AggPrice', {
-  price: 'Decimal',
-  precision: BCS.U64,
+export const AggPrice = bcs.struct('AggPrice', {
+  price: bcs.u256(), // Decimal
+  precision: bcs.u64(),
 });
 
 // Market
-bcs.registerStructType('VaultInfo', {
-  price: 'AggPrice',
-  value: 'Decimal',
+export const VaultInfo = bcs.struct('VaultInfo', {
+  price: AggPrice,
+  value: bcs.u256(), // Decimal
 });
 
-bcs.registerStructType('VaultsValuation', {
-  timestamp: BCS.U64,
-  num: BCS.U64,
-  handled: ['vector', 'Entry<TypeName,VaultInfo>'],
-  total_weight: 'Decimal',
-  value: 'Decimal',
+export const VaultsValuation = bcs.struct('VaultsValuation', {
+  timestamp: bcs.u64(),
+  num: bcs.u64(),
+  handled: bcs.vector(bcs.struct('Entry', {
+    key: bcs.string(), // TypeName
+    value: VaultInfo,
+  })),
+  total_weight: bcs.u256(), // Decimal
+  value: bcs.u256(), // Decimal
 });
 
-bcs.registerStructType('SymbolsValuation', {
-  timestamp: BCS.U64,
-  num: BCS.U64,
-  lp_supply_amount: 'Decimal',
-  handled: 'vector<TypeName>',
-  value: 'SDecimal',
+export const SymbolsValuation = bcs.struct('SymbolsValuation', {
+  timestamp: bcs.u64(),
+  num: bcs.u64(),
+  lp_supply_amount: bcs.u256(), // Decimal
+  handled: bcs.vector(bcs.string()), // vector<TypeName>
+  value: SDecimal,
 });
