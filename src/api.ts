@@ -423,4 +423,47 @@ export class SudoAPI extends SudoDataAPI {
       ],
     });
   };
+
+  // admin method
+  adminEmptyVault = async (
+    collateralToken: string,
+    timestamp: number = Math.floor(Date.now() / 1000)
+  ) => {
+    const tx = await this.initOracleTxb([collateralToken]);
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::admin_empty_vault`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[collateralToken].module,
+      ],
+      arguments: [
+        tx.object(this.consts.sudoCore.adminCap),
+        tx.object(this.consts.sudoCore.market),
+        tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+        tx.pure.u64(timestamp),
+      ],
+    });
+
+    return tx;
+  };
+
+    // admin method to remove vault from bag
+  adminRemoveVaultFromBag = async (collateralToken: string) => {
+    const tx = new Transaction();
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::admin_remove_vault_from_bag`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[collateralToken].module,
+      ],
+      arguments: [
+        tx.object(this.consts.sudoCore.adminCap),
+        tx.object(this.consts.sudoCore.market),
+      ],
+    });
+
+    return tx;
+  };
 }
