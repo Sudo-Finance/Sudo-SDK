@@ -1,7 +1,7 @@
 {
   "sudo_core": {
     "package": "0xc44d97a4bc4e5a33ca847b72b123172c88a6328196b71414f32c3070233604b2",
-    "upgraded_package": "0x30c2448d636ae79e4fc70ec46d60a776dc2c75e10a855f215ddedc4347648652",
+    "upgraded_package": "0xff1037e01743392fd4004d180c53476b72bcaa850304716cf91cf43f14d9dadc",
     "upgrade_cap": "0x2092387c072fe18f91b57b9dde362f758259ee88d993a5faf569b4f2eb288b12",
     "admin_cap": "0x0b4183c84de542c6f9623acd521294ea7e8205a2a7a23f4fac97e964fe4da30e",
     "market": "0x4d753c2c69109cbeb806393956cfeba28d832354a37d59d9a019ee580f82893d",
@@ -25,10 +25,6 @@
         "weight": "50000000000000000",
         "reserving_fee_model": "0xbb09fbc5c2103ffcde3c589463c700b7c6cd2c2a462429c6b5fd147c7b1aba4f"
       },
-      "navx": {
-        "weight": "50000000000000000",
-        "reserving_fee_model": "0xe9261453c7658fa12d9babac4eea3062425c5ca6ac638f28502bb43ea3d13679"
-      },
       "afSui": {
         "weight": "200000000000000000",
         "reserving_fee_model": "0x94243eff61204c6afb510639de396217dbbc0cc838626ce7ae8ab7aa9b30a020"
@@ -36,10 +32,6 @@
       "vSui": {
         "weight": "200000000000000000",
         "reserving_fee_model": "0xc02335751b486792862e2d04402f64296442e104e2ee79e1ef9a56f038a2cd2e"
-      },
-      "fud": {
-        "weight": "50000000000000000",
-        "reserving_fee_model": "0xc02cbd95ebb56e13fe6cb0ec49ddf2bebf7655cbca18f1e063bc1e1df8ceb6ea"
       },
       "buck": {
         "weight": "50000000000000000",
@@ -425,7 +417,6 @@
           "usdc",
           "usdt",
           "afSui",
-          "fud",
           "vSui",
           "ausd",
           "nusdc",

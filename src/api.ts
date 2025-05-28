@@ -156,7 +156,7 @@ export class SudoAPI extends SudoDataAPI {
     const [depositObject] = tx.splitCoins(coinObject, [tx.pure.u64(amount)]);
 
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::pledge_in_position`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::pledge_in_position`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[collateralToken].module,
@@ -183,7 +183,7 @@ export class SudoAPI extends SudoDataAPI {
     const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
 
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::redeem_from_position_v1_1`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::redeem_from_position_v1_1`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[collateralToken].module,
@@ -309,7 +309,7 @@ export class SudoAPI extends SudoDataAPI {
         throw new Error('invalid order type');
     }
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::${functionName}`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::${functionName}`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[collateralToken].module,
@@ -341,7 +341,7 @@ export class SudoAPI extends SudoDataAPI {
     const vaultsValuation = this.valuateVaults(tx);
 
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::swap`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::swap`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[fromToken].module,
@@ -367,7 +367,7 @@ export class SudoAPI extends SudoDataAPI {
     tx: Transaction
   ) => {
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::clear_closed_position`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::clear_closed_position`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[collateralToken].module,
@@ -386,7 +386,7 @@ export class SudoAPI extends SudoDataAPI {
     tx: Transaction
   ) => {
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::clear_open_position_order_v1_1`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::clear_open_position_order_v1_1`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[collateralToken].module,
@@ -409,7 +409,7 @@ export class SudoAPI extends SudoDataAPI {
     tx: Transaction
   ) => {
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::clear_decrease_position_order_v1_1`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::clear_decrease_position_order_v1_1`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[collateralToken].module,
