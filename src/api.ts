@@ -7,6 +7,7 @@ import {
   ALLOW_TRADE_CAN_TRADE,
   ALLOW_TRADE_MUST_TRADE,
   ALLOW_TRADE_NO_TRADE,
+  ICredential,
 } from './consts';
 
 export class SudoAPI extends SudoDataAPI {
@@ -34,6 +35,133 @@ export class SudoAPI extends SudoDataAPI {
       : indexPrice * (1 - slippage);
     return BigInt(Math.round(raw * 1e18));
   }
+
+  deposit = async (
+    coin: string,
+    coinObjects: string[],
+    amount: number,
+    minAmountOut: number = 0,
+  ) => {
+    const tx = await this.initOracleTxb(
+      Object.keys(this.consts.pythFeeder.feeder),
+    );
+    const coinObject = this.#processCoins(tx, coin, coinObjects);
+    const [depositObject] = tx.splitCoins(coinObject, [tx.pure.u64(amount)]);
+
+    const { vaultsValuation, symbolsValuation } = this.valuate(tx);
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.package}::market::deposit`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[coin].module,
+      ],
+      arguments: [
+        tx.object(this.consts.sudoCore.market),
+        tx.object(this.consts.sudoCore.rebaseFeeModel),
+        depositObject,
+        tx.pure.u64(minAmountOut),
+        vaultsValuation,
+        symbolsValuation,
+      ],
+    });
+    return tx;
+  };
+
+  withdraw = async (
+    coin: string,
+    slpCoinObjects: string[],
+    amount: number,
+    minAmountOut: number = 0,
+  ) => {
+    const tx = await this.initOracleTxb(
+      Object.keys(this.consts.pythFeeder.feeder),
+    );
+    const slpCoinObject = this.#processCoins(tx, 'slp', slpCoinObjects);
+    const [withdrawObject] = tx.splitCoins(slpCoinObject, [
+      tx.pure.u64(amount),
+    ]);
+
+    const { vaultsValuation, symbolsValuation } = this.valuate(tx);
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.package}::market::withdraw`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[coin].module,
+      ],
+      arguments: [
+        tx.object(this.consts.sudoCore.market),
+        tx.object(this.consts.sudoCore.rebaseFeeModel),
+        withdrawObject,
+        tx.pure.u64(minAmountOut),
+        vaultsValuation,
+        symbolsValuation,
+      ],
+    });
+    return tx;
+  };
+
+  // staking
+  stakeSlp = async (coinObjects: string[], amount: bigint, pool: string) => {
+    const tx = new Transaction();
+    const coinObject = this.#processCoins(tx, 'slp', coinObjects);
+    const [depositObject] = tx.splitCoins(coinObject, [tx.pure.u64(amount)]);
+
+    tx.moveCall({
+      target: `${this.consts.sudoStaking.package}::pool::deposit`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        `${this.consts.sudoCore.package}::slp::SLP`,
+      ],
+      arguments: [
+        tx.object(pool),
+        tx.object(SUI_CLOCK_OBJECT_ID),
+        depositObject,
+      ],
+    });
+    return tx;
+  };
+
+  unstakeSlp = async (
+    credentials: ICredential[],
+    amount: bigint,
+    pool: string,
+  ) => {
+    const tx = new Transaction();
+
+    for (const credential of credentials) {
+      // eslint-disable-next-line unicorn/prefer-math-min-max
+      const withdrawAmount =
+        amount < credential.amount ? amount : credential.amount;
+      amount -= withdrawAmount;
+      tx.moveCall({
+        target: `${this.consts.sudoStaking.package}::pool::withdraw`,
+        typeArguments: [
+          `${this.consts.sudoCore.package}::slp::SLP`,
+          `${this.consts.sudoCore.package}::slp::SLP`,
+        ],
+        arguments: [
+          tx.object(pool),
+          tx.object(SUI_CLOCK_OBJECT_ID),
+          tx.object(credential.id),
+          tx.pure.u64(withdrawAmount),
+        ],
+      });
+      if (credential.amount === BigInt(0)) {
+        tx.moveCall({
+          target: `${this.consts.sudoStaking.package}::pool::clear_empty_credential`,
+          typeArguments: [
+            `${this.consts.sudoCore.package}::slp::SLP`,
+            `${this.consts.sudoCore.package}::slp::SLP`,
+          ],
+          arguments: [tx.object(credential.id)],
+        });
+      }
+    }
+
+    return tx;
+  };
 
   openPosition = async (
     collateralToken: string,
