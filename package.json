@@ -44,7 +44,7 @@
     "decimal.js": "^10.4.3"
   },
   "resolutions": {
-    "axios": "1.1.0",
+    "axios": ">=1.8.2",
     "@mysten/sui": "1.28.2",
     "typescript": "5.8.2"
   }
