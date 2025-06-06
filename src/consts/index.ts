@@ -10,7 +10,6 @@ interface IVault {
 }
 
 interface IPrizePool {
-  coin: string;
   prizePool: string;
 }
 
@@ -25,6 +24,33 @@ interface ICoin {
   module: string;
   metadata: string;
   treasury: string | null;
+}
+
+
+export interface IStaked {
+  credentials: ICredential[];
+  amount: bigint;
+  claimable: bigint;
+}
+
+export interface ICredential {
+  id: string;
+  lockUntil: number;
+  accRewardPerShare: bigint;
+  amount: bigint;
+  claimable: bigint;
+}
+
+export interface IStakePool {
+  id: string;
+  enabled: boolean;
+  lastUpdatedTime: number;
+  stakedAmount: bigint;
+  reward: bigint;
+  startTime: number;
+  endTime: number;
+  accRewardPerShare: bigint;
+  lockDuration: number;
 }
 
 type IVersionedContract = string;
