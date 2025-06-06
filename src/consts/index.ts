@@ -10,6 +10,7 @@ interface IVault {
 }
 
 interface IPrizePool {
+  coin: string;
   prizePool: string;
 }
 
