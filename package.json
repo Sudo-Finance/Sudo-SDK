@@ -1,6 +1,6 @@
 {
   "name": "sudo-sdk",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "SDK for Sudo Finance, Perpetual Protocol on Sui",
   "exports": {
     ".": {
