@@ -574,30 +574,39 @@ export class SudoDataAPI extends OracleAPI {
   public async getPositionCapInfoList(
     owner: string,
   ): Promise<IPositionCapInfo[]> {
-    const positionCaps = await this.provider.getOwnedObjects({
-      owner,
-      filter: {
-        StructType: `${this.consts.sudoCore.package}::market::PositionCap`,
-      },
-      options: {
-        showType: true,
-      },
-    });
+    let cursor: string | undefined | null = undefined;
+    let hasNextPage = true;
     const positionCapInfoList = [];
 
-    for (const positionCap of positionCaps.data) {
-      if (positionCap.data?.type?.includes('PositionCap')) {
-        positionCapInfoList.push({
-          positionCapId: positionCap.data.objectId,
-          symbol0: positionCap.data.type.split('<')[1].split(',')[0].trim(),
-          symbol1: positionCap.data.type
-            .split('<')[1]
-            .split(',')[1]
-            .split(',')[0]
-            .trim(),
-          long: positionCap.data.type.includes('LONG'),
-        });
+    while (hasNextPage) {
+      const positionCaps = await this.provider.getOwnedObjects({
+        owner,
+        filter: {
+          StructType: `${this.consts.sudoCore.package}::market::PositionCap`,
+        },
+        options: {
+          showType: true,
+        },
+        cursor,
+      });
+
+      for (const positionCap of positionCaps.data) {
+        if (positionCap.data?.type?.includes('PositionCap')) {
+          positionCapInfoList.push({
+            positionCapId: positionCap.data.objectId,
+            symbol0: positionCap.data.type.split('<')[1].split(',')[0].trim(),
+            symbol1: positionCap.data.type
+              .split('<')[1]
+              .split(',')[1]
+              .split(',')[0]
+              .trim(),
+            long: positionCap.data.type.includes('LONG'),
+          });
+        }
       }
+
+      hasNextPage = positionCaps.hasNextPage;
+      cursor = positionCaps.nextCursor;
     }
 
     return positionCapInfoList;
@@ -642,32 +651,43 @@ export class SudoDataAPI extends OracleAPI {
   }
 
   public async getOrderCapInfoList(owner: string) {
-    const orderCaps = await this.provider.getOwnedObjects({
-      owner,
-      filter: {
-        StructType: `${this.consts.sudoCore.package}::market::OrderCap`,
-      },
-      options: {
-        showType: true,
-        showContent: true,
-      },
-    });
+    let cursor: string | undefined | null = undefined;
+    let hasNextPage = true;
     const orderCapInfoList = [];
-    for (const orderCap of orderCaps.data) {
-      if (orderCap.data?.type?.includes('OrderCap')) {
-        orderCapInfoList.push({
-          orderCapId: orderCap.data.objectId,
-          symbol0: orderCap.data.type.split('<')[1].split(',')[0].trim(),
-          symbol1: orderCap.data.type
-            .split('<')[1]
-            .split(',')[1]
-            .split(',')[0]
-            .trim(),
-          long: orderCap.data.type.includes('LONG'),
-          positionId: (orderCap.data.content as any)?.fields?.position_id,
-        });
+
+    while (hasNextPage) {
+      const orderCaps = await this.provider.getOwnedObjects({
+        owner,
+        filter: {
+          StructType: `${this.consts.sudoCore.package}::market::OrderCap`,
+        },
+        options: {
+          showType: true,
+          showContent: true,
+        },
+        cursor,
+      });
+
+      for (const orderCap of orderCaps.data) {
+        if (orderCap.data?.type?.includes('OrderCap')) {
+          orderCapInfoList.push({
+            orderCapId: orderCap.data.objectId,
+            symbol0: orderCap.data.type.split('<')[1].split(',')[0].trim(),
+            symbol1: orderCap.data.type
+              .split('<')[1]
+              .split(',')[1]
+              .split(',')[0]
+              .trim(),
+            long: orderCap.data.type.includes('LONG'),
+            positionId: (orderCap.data.content as any)?.fields?.position_id,
+          });
+        }
       }
+
+      hasNextPage = orderCaps.hasNextPage;
+      cursor = orderCaps.nextCursor;
     }
+
     return orderCapInfoList;
   }
 
