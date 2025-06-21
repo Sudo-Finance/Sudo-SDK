@@ -84,8 +84,11 @@ export class OracleAPI {
     });
   }
 
-  async initOracleTxb(tokens: string[]) {
-    const tx = new Transaction();
+  async initOracleTxb(tokens: string[], tx?: Transaction) {
+    let tx_ = tx
+    if (!tx_) {
+      tx_ = new Transaction()
+    }
     // Remove redundant tokens first
     tokens = [...new Set(tokens)];
 
@@ -108,13 +111,13 @@ export class OracleAPI {
           (pythObject.data?.content as any).fields.price_info.fields
             .arrival_time || 0,
         ) -
-          new Date().getTime() / 1000,
+        new Date().getTime() / 1000,
         pythObject.data?.objectId,
       ])
       .filter((x: any) => Math.abs(x[0]) > 7)
       .map(x => x[1] as string);
     if (!needUpdateObjectIds.length) {
-      return tx;
+      return tx_;
     }
     const priceFeedIds = needUpdateObjectIds.map(
       pythObjectId => this.PythFeederToPriceId[pythObjectId],
@@ -131,7 +134,7 @@ export class OracleAPI {
       this.consts.pythFeeder.state,
       this.consts.pythFeeder.wormhole.state,
     );
-    await client.updatePriceFeeds(tx, priceUpdateData, priceFeedIds);
-    return tx;
+    await client.updatePriceFeeds(tx_, priceUpdateData, priceFeedIds);
+    return tx_;
   }
 }
