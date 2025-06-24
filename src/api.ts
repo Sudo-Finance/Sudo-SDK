@@ -370,6 +370,79 @@ export class SudoAPI extends SudoDataAPI {
     return tx;
   };
 
+  decreaseMultiPositions = async (positions: Array<{
+    pcpId: string,
+    collateralToken: string,
+    coinObjects: string[],
+    indexToken: string,
+    amount: bigint,
+    long: boolean,
+    indexPrice: number,
+    collateralPrice: number,
+    isTriggerOrder: boolean,
+    isTakeProfitOrder: boolean,
+    isIocOrder: boolean,
+    slippage: number,
+    relayerFee: bigint,
+  }>, tx?: Transaction) => {
+    if (!tx) {
+      tx = new Transaction();
+    }
+    tx = await this.initOracleTxb(positions.map(position => [position.collateralToken, position.indexToken]).flat(), tx);
+
+    for (const position of positions) {
+      const {
+        pcpId,
+        collateralToken,
+        coinObjects, indexToken, amount, long, indexPrice, collateralPrice, isTriggerOrder, isTakeProfitOrder, isIocOrder, slippage, relayerFee
+      } = position;
+      let innerIsTakeProfitOrder = isTakeProfitOrder;
+      const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+      const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
+      const feeObject = tx.splitCoins(coinObject, [tx.pure.u64(relayerFee)]);
+
+      const adjustPrice = this.#processSlippage(indexPrice, !long, isTriggerOrder ? 0 : slippage);
+      const adjustCollateralPrice = this.#processSlippage(collateralPrice, false, 0.5);
+
+      let allowTrade = ALLOW_TRADE_MUST_TRADE;
+      if (isTriggerOrder) {
+        allowTrade = isIocOrder || !innerIsTakeProfitOrder ? ALLOW_TRADE_NO_TRADE : ALLOW_TRADE_CAN_TRADE;
+      } else {
+        innerIsTakeProfitOrder = true;
+      }
+
+      tx.moveCall({
+        target: `${this.consts.sudoCore.upgradedPackage}::market::decrease_position_v1_2`,
+        typeArguments: [
+          `${this.consts.sudoCore.package}::slp::SLP`,
+          this.consts.coins[collateralToken].module,
+          this.consts.coins[indexToken].module,
+          `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+          this.consts.coins['sui'].module,
+        ],
+        arguments: [
+          tx.object(SUI_CLOCK_OBJECT_ID),
+          tx.object(this.consts.sudoCore.market),
+          tx.object(pcpId),
+          tx.object(
+            this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
+          ),
+          tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
+          tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+          tx.object(this.consts.pythFeeder.feeder[indexToken]),
+          feeObject,
+          tx.pure.u8(allowTrade),
+          tx.pure.bool(isTakeProfitOrder),
+          tx.pure.u64(amount),
+          tx.pure.u256(adjustCollateralPrice),
+          tx.pure.u256(adjustPrice),
+          tx.pure.bool(isTriggerOrder),
+        ],
+      });
+    }
+    return tx;
+  };
+
   cancelOrder = async (
     orderCapId: string,
     collateralToken: string,
@@ -503,7 +576,7 @@ export class SudoAPI extends SudoDataAPI {
       });
     }
     return tx;
-  }
+  };
 
   clearOpenPositionOrder = (
     orderCapId: string,
@@ -551,76 +624,6 @@ export class SudoAPI extends SudoDataAPI {
     });
   };
 
-  decreaseMultiPositions = async (positions: Array<{
-    pcpId: string,
-    collateralToken: string,
-    coinObjects: string[],
-    indexToken: string,
-    amount: bigint,
-    long: boolean,
-    indexPrice: number,
-    collateralPrice: number,
-    isTriggerOrder: boolean,
-    isTakeProfitOrder: boolean,
-    isIocOrder: boolean,
-    slippage: number,
-    relayerFee: bigint,
-  }>) => {
-    const tx = await this.initOracleTxb(positions.map(position => [position.collateralToken, position.indexToken]).flat());
-
-    for (const position of positions) {
-      const {
-        pcpId,
-        collateralToken,
-        coinObjects, indexToken, amount, long, indexPrice, collateralPrice, isTriggerOrder, isTakeProfitOrder, isIocOrder, slippage, relayerFee
-      } = position;
-      let innerIsTakeProfitOrder = isTakeProfitOrder;
-      const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
-      const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
-      const feeObject = tx.splitCoins(coinObject, [tx.pure.u64(relayerFee)]);
-
-      const adjustPrice = this.#processSlippage(indexPrice, !long, isTriggerOrder ? 0 : slippage);
-      const adjustCollateralPrice = this.#processSlippage(collateralPrice, false, 0.5);
-
-      let allowTrade = ALLOW_TRADE_MUST_TRADE;
-      if (isTriggerOrder) {
-        allowTrade = isIocOrder || !innerIsTakeProfitOrder ? ALLOW_TRADE_NO_TRADE : ALLOW_TRADE_CAN_TRADE;
-      } else {
-        innerIsTakeProfitOrder = true;
-      }
-
-      tx.moveCall({
-        target: `${this.consts.sudoCore.upgradedPackage}::market::decrease_position_v1_2`,
-        typeArguments: [
-          `${this.consts.sudoCore.package}::slp::SLP`,
-          this.consts.coins[collateralToken].module,
-          this.consts.coins[indexToken].module,
-          `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
-          this.consts.coins['sui'].module,
-        ],
-        arguments: [
-          tx.object(SUI_CLOCK_OBJECT_ID),
-          tx.object(this.consts.sudoCore.market),
-          tx.object(pcpId),
-          tx.object(
-            this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
-          ),
-          tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
-          tx.object(this.consts.pythFeeder.feeder[collateralToken]),
-          tx.object(this.consts.pythFeeder.feeder[indexToken]),
-          feeObject,
-          tx.pure.u8(allowTrade),
-          tx.pure.bool(isTakeProfitOrder),
-          tx.pure.u64(amount),
-          tx.pure.u256(adjustCollateralPrice),
-          tx.pure.u256(adjustPrice),
-          tx.pure.bool(isTriggerOrder),
-        ],
-      });
-    }
-    return tx;
-  }
-
   addReferral = (referrer: string, tx?: Transaction | undefined) => {
     if (!tx) {
       tx = new Transaction();
@@ -632,13 +635,13 @@ export class SudoAPI extends SudoDataAPI {
     });
 
     return tx;
-  }
+  };
 
   // admin methods
   adminUpdatePriceFeed = async (collateralToken: string, indexToken: string) => {
     const tx = await this.initOracleTxb([collateralToken, indexToken]);
     return tx;
-  }
+  };
 
   // admin methods
   adminClearClosedPosition = async (
