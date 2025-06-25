@@ -166,77 +166,39 @@ export class SudoAPI extends SudoDataAPI {
   openPosition = async (
     collateralToken: string,
     indexToken: string,
-    leverage: number,
-    collateral: number,
-    positionConfig: IPositionConfig,
+    size: bigint,
+    collateralAmount: bigint,
     coinObjects: string[],
     long: boolean,
-    indexPrice: number, // This can be the market price or limit price
+    reserveAmount: bigint,
+    indexPrice: number,
     collateralPrice: number,
+    isLimitOrder = false,
+    isIocOrder = false,
     pricesSlippage: number = 0.003,
     collateralSlippage: number = 0.5,
-    isLimitOrder: boolean = false,
-    isIocOrder: boolean = false,
-    relayerFee: bigint = BigInt(1)
+    relayerFee = BigInt(0.5),
+    referralAddress = '',
+    sender = '',
   ) => {
-    const tx = await this.initOracleTxb([collateralToken, indexToken]);
-    const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
-
-    const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
-
-    let effectiveLeverage = leverage;
-    if (positionConfig?.maxLeverage === leverage) {
-      effectiveLeverage = leverage * 0.999;
+    let tx = new Transaction();
+    if (referralAddress && !(await this.hasReferral(sender || ''))) {
+      tx = await this.addReferral(referralAddress, tx);
     }
-
-    const realLeverage = leverage / (1 + positionConfig?.openFeeBps * leverage);
-
-    const leveragedAmount =
-      (collateral * collateralPrice * realLeverage) / indexPrice;
-
-    const reserveAmount = BigInt(
-      (
-        collateral *
-        Math.min(
-          effectiveLeverage,
-          positionConfig?.maxReservedMultiplier || 0
-        ) *
-        10 ** this.consts.coins[collateralToken].decimals
-      ).toFixed(0)
-    );
-
-    const size = BigInt(
-      (leveragedAmount * 10 ** this.consts.coins[indexToken].decimals).toFixed(
-        0
-      )
-    );
-    const collateralAmount = BigInt(
-      (collateral * 10 ** this.consts.coins[collateralToken].decimals).toFixed(0)
-    );
-
+    tx = await this.initOracleTxb([collateralToken, indexToken], tx);
+    const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
     const [depositObject] = tx.splitCoins(coinObject, [
       tx.pure.u64(collateralAmount),
     ]);
-    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]); // Sudo contract requires SUI as fee
 
-    const adjustPrice = this.#processSlippage(
-      indexPrice,
-      long,
-      isLimitOrder ? 0 : pricesSlippage
-    );
-    const adjustCollateralPrice = this.#processSlippage(
-      collateralPrice,
-      false,
-      collateralSlippage
-    );
+    const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+    const adjustPrice = this.#processSlippage(indexPrice, long, isLimitOrder ? 0 : pricesSlippage);
+    const adjustCollateralPrice = this.#processSlippage(collateralPrice, false, collateralSlippage);
 
     let allowTrade = ALLOW_TRADE_MUST_TRADE;
     if (isLimitOrder) {
-      if (isIocOrder) {
-        allowTrade = ALLOW_TRADE_NO_TRADE;
-      } else {
-        allowTrade = ALLOW_TRADE_CAN_TRADE;
-      }
+      allowTrade = isIocOrder ? ALLOW_TRADE_NO_TRADE : ALLOW_TRADE_CAN_TRADE;
     }
 
     tx.moveCall({
@@ -339,25 +301,20 @@ export class SudoAPI extends SudoDataAPI {
     pcpId: string,
     collateralToken: string,
     indexToken: string,
-    positionAmount: number,
     amount: bigint,
     long: boolean,
-    marketPrice: number,
     indexPrice: number,
     collateralPrice: number,
-    isTriggerOrder: boolean = false,
-    isIocOrder: boolean = false,
+    isTriggerOrder = false,
+    isTakeProfitOrder = true,
+    isIocOrder = false,
     pricesSlippage: number = 0.003,
     collateralSlippage: number = 0.5,
-    relayerFee: bigint = BigInt(1)
+    relayerFee = BigInt(0.5)
   ) => {
     const tx = await this.initOracleTxb([collateralToken, indexToken]);
     const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
-    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]);
-
-    let isTakeProfitOrder =
-      (!long && (indexPrice || 0) < marketPrice) ||
-      (long && (indexPrice || 0) > marketPrice);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]); // Sudo contract requires SUI as fee
 
     const adjustPrice = this.#processSlippage(
       indexPrice,
@@ -410,10 +367,79 @@ export class SudoAPI extends SudoDataAPI {
       ],
     });
 
-    if (amount === BigInt(positionAmount) && !isTriggerOrder) {
-      this.clearClosedPosition(pcpId, collateralToken, indexToken, long, tx);
-    }
+    return tx;
+  };
 
+  decreaseMultiPositions = async (positions: Array<{
+    pcpId: string,
+    collateralToken: string,
+    coinObjects: string[],
+    indexToken: string,
+    amount: bigint,
+    long: boolean,
+    indexPrice: number,
+    collateralPrice: number,
+    isTriggerOrder: boolean,
+    isTakeProfitOrder: boolean,
+    isIocOrder: boolean,
+    slippage: number,
+    relayerFee: bigint,
+  }>, tx?: Transaction) => {
+    if (!tx) {
+      tx = new Transaction();
+    }
+    tx = await this.initOracleTxb(positions.map(position => [position.collateralToken, position.indexToken]).flat(), tx);
+
+    for (const position of positions) {
+      const {
+        pcpId,
+        collateralToken,
+        coinObjects, indexToken, amount, long, indexPrice, collateralPrice, isTriggerOrder, isTakeProfitOrder, isIocOrder, slippage, relayerFee
+      } = position;
+      let innerIsTakeProfitOrder = isTakeProfitOrder;
+      const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+      const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
+      const feeObject = tx.splitCoins(coinObject, [tx.pure.u64(relayerFee)]);
+
+      const adjustPrice = this.#processSlippage(indexPrice, !long, isTriggerOrder ? 0 : slippage);
+      const adjustCollateralPrice = this.#processSlippage(collateralPrice, false, 0.5);
+
+      let allowTrade = ALLOW_TRADE_MUST_TRADE;
+      if (isTriggerOrder) {
+        allowTrade = isIocOrder || !innerIsTakeProfitOrder ? ALLOW_TRADE_NO_TRADE : ALLOW_TRADE_CAN_TRADE;
+      } else {
+        innerIsTakeProfitOrder = true;
+      }
+
+      tx.moveCall({
+        target: `${this.consts.sudoCore.upgradedPackage}::market::decrease_position_v1_2`,
+        typeArguments: [
+          `${this.consts.sudoCore.package}::slp::SLP`,
+          this.consts.coins[collateralToken].module,
+          this.consts.coins[indexToken].module,
+          `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+          this.consts.coins['sui'].module,
+        ],
+        arguments: [
+          tx.object(SUI_CLOCK_OBJECT_ID),
+          tx.object(this.consts.sudoCore.market),
+          tx.object(pcpId),
+          tx.object(
+            this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
+          ),
+          tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
+          tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+          tx.object(this.consts.pythFeeder.feeder[indexToken]),
+          feeObject,
+          tx.pure.u8(allowTrade),
+          tx.pure.bool(isTakeProfitOrder),
+          tx.pure.u64(amount),
+          tx.pure.u256(adjustCollateralPrice),
+          tx.pure.u256(adjustPrice),
+          tx.pure.bool(isTriggerOrder),
+        ],
+      });
+    }
     return tx;
   };
 
@@ -487,7 +513,7 @@ export class SudoAPI extends SudoDataAPI {
     return tx;
   };
 
-  clearClosedPosition = async (
+  clearClosedPosition = (
     pcpId: string,
     collateralToken: string,
     indexToken: string,
@@ -506,7 +532,53 @@ export class SudoAPI extends SudoDataAPI {
     });
   };
 
-  clearOpenPositionOrder = async (
+  cancelMultiOrder = async (orders: Array<{
+    orderCapId: string,
+    collateralToken: string,
+    indexToken: string,
+    long: boolean,
+    type: string,
+    isV11Order: boolean,
+  }>, tx?: Transaction) => {
+    if (!tx) {
+      tx = new Transaction();
+    }
+
+    for (const order of orders) {
+      const { orderCapId, collateralToken, indexToken, long, type, isV11Order } = order;
+      let functionName = '';
+      switch (type) {
+        case 'OPEN_POSITION': {
+          functionName = isV11Order ? 'clear_open_position_order_v1_1' : 'clear_open_position_order_v1_1';
+          break;
+        }
+        case 'DECREASE_POSITION': {
+          functionName = isV11Order
+            ? 'clear_decrease_position_order_v1_1'
+            : 'clear_decrease_position_order_v1_1';
+          break;
+        }
+        default: {
+          throw new Error('invalid order type');
+        }
+      }
+
+      tx.moveCall({
+        target: `${this.consts.sudoCore.upgradedPackage}::market::${functionName}`,
+        typeArguments: [
+          `${this.consts.sudoCore.package}::slp::SLP`,
+          this.consts.coins[collateralToken].module,
+          this.consts.coins[indexToken].module,
+          `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+          this.consts.coins[collateralToken].module,
+        ],
+        arguments: [tx.object(this.consts.sudoCore.market), tx.object(orderCapId)],
+      });
+    }
+    return tx;
+  };
+
+  clearOpenPositionOrder = (
     orderCapId: string,
     collateralToken: string,
     indexToken: string,
@@ -529,7 +601,7 @@ export class SudoAPI extends SudoDataAPI {
     });
   };
 
-  clearDecreasePositionOrder = async (
+  clearDecreasePositionOrder = (
     orderCapId: string,
     collateralToken: string,
     indexToken: string,
@@ -550,5 +622,116 @@ export class SudoAPI extends SudoDataAPI {
         tx.object(orderCapId),
       ],
     });
+  };
+
+  addReferral = (referrer: string, tx?: Transaction | undefined) => {
+    if (!tx) {
+      tx = new Transaction();
+    }
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::add_new_referral`,
+      typeArguments: [`${this.consts.sudoCore.package}::slp::SLP`],
+      arguments: [tx.object(this.consts.sudoCore.market), tx.object(referrer)],
+    });
+
+    return tx;
+  };
+
+  // admin methods
+  adminUpdatePriceFeed = async (collateralToken: string, indexToken: string) => {
+    const tx = await this.initOracleTxb([collateralToken, indexToken]);
+    return tx;
+  };
+
+  // admin methods
+  adminClearClosedPosition = async (
+    positionId: string,
+    owner: string,
+    collateralToken: string,
+    indexToken: string,
+    long: boolean,
+    tx: Transaction,
+  ) => {
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::admin_clear_closed_position_v1_1`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[collateralToken].module,
+        this.consts.coins[indexToken].module,
+        `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+      ],
+      arguments: [
+        tx.object(this.consts.sudoCore.adminCap),
+        tx.object(owner),
+        tx.object(this.consts.sudoCore.market),
+        tx.object(positionId),
+      ],
+    });
+  };
+
+  adminDecreasePosition = async (
+    positionId: string,
+    owner: string,
+    collateralToken: string,
+    indexToken: string,
+    positionAmount: number,
+    amount: bigint,
+    long: boolean,
+    collateralPrice: number,
+    collateralSlippage: number = 0.5,
+    relayerFee: bigint = BigInt(1),
+  ) => {
+    const tx = await this.initOracleTxb([collateralToken, indexToken]);
+    const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]);
+
+    const adjustCollateralPrice = this.#processSlippage(
+      collateralPrice,
+      false,
+      collateralSlippage,
+    );
+
+    let allowTrade = ALLOW_TRADE_MUST_TRADE;
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::admin_decrease_position_v1_3`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[collateralToken].module,
+        this.consts.coins[indexToken].module,
+        `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+        this.consts.coins['sui'].module,
+      ],
+      arguments: [
+        tx.object(this.consts.sudoCore.adminCap),
+        tx.object(SUI_CLOCK_OBJECT_ID),
+        tx.object(this.consts.sudoCore.market),
+        tx.object(positionId),
+        tx.object(
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel,
+        ),
+        tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
+        tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+        tx.object(this.consts.pythFeeder.feeder[indexToken]),
+        feeObject,
+        tx.pure.u8(allowTrade),
+        tx.pure.u64(amount),
+        tx.pure.u256(adjustCollateralPrice),
+        tx.object(owner),
+      ],
+    });
+
+    if (amount === BigInt(positionAmount)) {
+      this.adminClearClosedPosition(
+        positionId,
+        owner,
+        collateralToken,
+        indexToken,
+        long,
+        tx,
+      );
+    }
+
+    return tx;
   };
 }

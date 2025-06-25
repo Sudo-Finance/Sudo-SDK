@@ -547,11 +547,9 @@ export class SudoDataAPI extends OracleAPI {
     const rawData = await this.provider.getDynamicFieldObject({
       parentId: this.consts.sudoCore.symbolsParent,
       name: {
-        type: `${this.consts.sudoCore.package}::market::SymbolName<${
-          this.consts.coins[indexToken].module
-        }, ${this.consts.sudoCore.package}::market::${
-          long ? 'LONG' : 'SHORT'
-        }>`,
+        type: `${this.consts.sudoCore.package}::market::SymbolName<${this.consts.coins[indexToken].module
+          }, ${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'
+          }>`,
         value: { dummy_field: false },
       },
     });
@@ -622,11 +620,9 @@ export class SudoDataAPI extends OracleAPI {
         const positionRaw = await this.provider.getDynamicFieldObject({
           parentId: this.consts.sudoCore.positionsParent,
           name: {
-            type: `${this.consts.sudoCore.package}::market::PositionName<${
-              positionCapInfo.symbol0
-            }, ${positionCapInfo.symbol1}, ${
-              this.consts.sudoCore.package
-            }::market::${positionCapInfo.long ? 'LONG' : 'SHORT'}>`,
+            type: `${this.consts.sudoCore.package}::market::PositionName<${positionCapInfo.symbol0
+              }, ${positionCapInfo.symbol1}, ${this.consts.sudoCore.package
+              }::market::${positionCapInfo.long ? 'LONG' : 'SHORT'}>`,
             value: {
               owner,
               id: positionCapInfo.positionCapId,
@@ -701,13 +697,10 @@ export class SudoDataAPI extends OracleAPI {
         const orderRaw = await this.provider.getDynamicFieldObject({
           parentId: this.consts.sudoCore.ordersParent,
           name: {
-            type: `${this.consts.sudoCore.package}::market::OrderName<${
-              orderCapInfo.symbol0
-            }, ${orderCapInfo.symbol1}, ${
-              this.consts.sudoCore.package
-            }::market::${orderCapInfo.long ? 'LONG' : 'SHORT'}, ${
-              this.consts.coins['sui'].module
-            }>`,
+            type: `${this.consts.sudoCore.package}::market::OrderName<${orderCapInfo.symbol0
+              }, ${orderCapInfo.symbol1}, ${this.consts.sudoCore.package
+              }::market::${orderCapInfo.long ? 'LONG' : 'SHORT'}, ${this.consts.coins['sui'].module
+              }>`,
             value: {
               owner,
               id: orderCapInfo.orderCapId,
@@ -750,30 +743,30 @@ export class SudoDataAPI extends OracleAPI {
     const symbolsValuationOffset =
       Object.keys(this.consts.sudoCore.symbols).length + 1;
 
-      const vaultsValuation = VaultsValuation.parse(
-        new Uint8Array(
-          (
-            (res.results as any)[
-              (res.results?.length || 0) - symbolsValuationOffset - 1
-            ].mutableReferenceOutputs as any
-          )[1][1],
-        ),
-      );
+    const vaultsValuation = VaultsValuation.parse(
+      new Uint8Array(
+        (
+          (res.results as any)[
+            (res.results?.length || 0) - symbolsValuationOffset - 1
+          ].mutableReferenceOutputs as any
+        )[1][1],
+      ),
+    );
 
-      const symbolsValuation = SymbolsValuation.parse(
-        new Uint8Array(
-          (
-            (res.results as any)[(res.results?.length || 0) - 1]
-              .mutableReferenceOutputs as any
-          )[1][1],
-        ),
-      );
+    const symbolsValuation = SymbolsValuation.parse(
+      new Uint8Array(
+        (
+          (res.results as any)[(res.results?.length || 0) - 1]
+            .mutableReferenceOutputs as any
+        )[1][1],
+      ),
+    );
 
     const result =
       Number(
         BigInt(vaultsValuation.value) +
-          BigInt(symbolsValuation.value.value) *
-            BigInt(symbolsValuation.value.is_positive ? 1 : -1),
+        BigInt(symbolsValuation.value.value) *
+        BigInt(symbolsValuation.value.is_positive ? 1 : -1),
       ) / 1e18;
     return result;
   };
@@ -938,10 +931,10 @@ export class SudoDataAPI extends OracleAPI {
       amount;
     const utilization = vaultSupply
       ? parseInt(
-          (((vaultInfo.reservedAmount + amount) / vaultSupply) * 1e18).toFixed(
-            0,
-          ),
-        )
+        (((vaultInfo.reservedAmount + amount) / vaultSupply) * 1e18).toFixed(
+          0,
+        ),
+      )
       : 0;
     const tx = new Transaction();
     tx.moveCall({
@@ -983,8 +976,7 @@ export class SudoDataAPI extends OracleAPI {
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[position.collateralToken].module,
         this.consts.coins[position.indexToken].module,
-        `${this.consts.sudoCore.package}::market::${
-          position.long ? 'LONG' : 'SHORT'
+        `${this.consts.sudoCore.package}::market::${position.long ? 'LONG' : 'SHORT'
         }`,
       ],
       arguments: [
@@ -1035,8 +1027,7 @@ export class SudoDataAPI extends OracleAPI {
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[position.indexToken].module,
-        `${this.consts.sudoCore.package}::market::${
-          position.long ? 'LONG' : 'SHORT'
+        `${this.consts.sudoCore.package}::market::${position.long ? 'LONG' : 'SHORT'
         }`,
       ],
       arguments: [tx.object(this.consts.sudoCore.market)],
@@ -1047,8 +1038,7 @@ export class SudoDataAPI extends OracleAPI {
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[position.collateralToken].module,
         this.consts.coins[position.indexToken].module,
-        `${this.consts.sudoCore.package}::market::${
-          position.long ? 'LONG' : 'SHORT'
+        `${this.consts.sudoCore.package}::market::${position.long ? 'LONG' : 'SHORT'
         }`,
       ],
       arguments: [
@@ -1123,4 +1113,20 @@ export class SudoDataAPI extends OracleAPI {
   getHistories = async (owner: string): Promise<IHistory[]> => {
     return await this.getHistoryInfoList(owner);
   };
+
+  async getReferralData(referree: string): Promise<any> {
+    const raw = await this.provider.getDynamicFieldObject({
+      parentId: this.consts.sudoCore.referralsParent,
+      name: {
+        type: 'address',
+        value: referree,
+      },
+    })
+    return raw
+  }
+
+  async hasReferral(referree: string): Promise<boolean> {
+    const raw = await this.getReferralData(referree)
+    return !raw.error
+  }
 }
