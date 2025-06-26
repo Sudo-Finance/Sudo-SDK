@@ -179,7 +179,7 @@ export class SudoDataAPI extends OracleAPI {
 
   valuateVaults = (tx: Transaction) => {
     const vaultsValuation = tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::create_vaults_valuation`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::create_vaults_valuation`,
       typeArguments: [`${this.consts.sudoCore.package}::slp::SLP`],
       arguments: [
         tx.object(SUI_CLOCK_OBJECT_ID),
@@ -190,7 +190,7 @@ export class SudoDataAPI extends OracleAPI {
       const vault = this.consts.sudoCore.vaults[key];
 
       tx.moveCall({
-        target: `${this.consts.sudoCore.package}::market::valuate_vault_v1_1`,
+        target: `${this.consts.sudoCore.upgradedPackage}::market::valuate_vault_v1_1`,
         typeArguments: [
           `${this.consts.sudoCore.package}::slp::SLP`,
           this.consts.coins[key].module,
@@ -208,7 +208,7 @@ export class SudoDataAPI extends OracleAPI {
 
   valuateSymbols = (tx: Transaction) => {
     const symbolsValuation = tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::create_symbols_valuation`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::create_symbols_valuation`,
       typeArguments: [`${this.consts.sudoCore.package}::slp::SLP`],
       arguments: [
         tx.object(SUI_CLOCK_OBJECT_ID),
@@ -219,7 +219,7 @@ export class SudoDataAPI extends OracleAPI {
       const [direction, token] = parseSymbolKey(key);
       const symbol = this.consts.sudoCore.symbols[key];
       tx.moveCall({
-        target: `${this.consts.sudoCore.package}::market::valuate_symbol_v1_1`,
+        target: `${this.consts.sudoCore.upgradedPackage}::market::valuate_symbol_v1_1`,
         typeArguments: [
           `${this.consts.sudoCore.package}::slp::SLP`,
           this.consts.coins[token].module,
@@ -945,7 +945,7 @@ export class SudoDataAPI extends OracleAPI {
       : 0;
     const tx = new Transaction();
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::model::compute_reserving_fee_rate`,
+      target: `${this.consts.sudoCore.upgradedPackage}::model::compute_reserving_fee_rate`,
       arguments: [
         tx.object(
           this.consts.sudoCore.vaults[collateralToken].reservingFeeModel,
@@ -994,7 +994,7 @@ export class SudoDataAPI extends OracleAPI {
       ],
     });
     const vaultDeltaReservingRate = tx.moveCall({
-      target: `${this.consts.sudoCore.package}::pool::vault_delta_reserving_rate`,
+      target: `${this.consts.sudoCore.upgradedPackage}::pool::vault_delta_reserving_rate`,
       typeArguments: [this.consts.coins[position.collateralToken].module],
       arguments: [
         vault,
@@ -1006,12 +1006,12 @@ export class SudoDataAPI extends OracleAPI {
       ],
     });
     const vaultAccReservingRate = tx.moveCall({
-      target: `${this.consts.sudoCore.package}::pool::vault_acc_reserving_rate`,
+      target: `${this.consts.sudoCore.upgradedPackage}::pool::vault_acc_reserving_rate`,
       typeArguments: [this.consts.coins[position.collateralToken].module],
       arguments: [vault, vaultDeltaReservingRate],
     });
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::position::compute_reserving_fee_amount`,
+      target: `${this.consts.sudoCore.upgradedPackage}::position::compute_reserving_fee_amount`,
       typeArguments: [this.consts.coins[position.collateralToken].module],
       arguments: [pos, vaultAccReservingRate],
     });

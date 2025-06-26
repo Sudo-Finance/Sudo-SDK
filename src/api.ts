@@ -51,7 +51,7 @@ export class SudoAPI extends SudoDataAPI {
     const { vaultsValuation, symbolsValuation } = this.valuate(tx);
 
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::deposit`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::deposit`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[coin].module,
@@ -85,7 +85,7 @@ export class SudoAPI extends SudoDataAPI {
     const { vaultsValuation, symbolsValuation } = this.valuate(tx);
 
     tx.moveCall({
-      target: `${this.consts.sudoCore.package}::market::withdraw`,
+      target: `${this.consts.sudoCore.upgradedPackage}::market::withdraw`,
       typeArguments: [
         `${this.consts.sudoCore.package}::slp::SLP`,
         this.consts.coins[coin].module,
