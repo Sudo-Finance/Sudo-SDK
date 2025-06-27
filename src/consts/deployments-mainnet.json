@@ -51,36 +51,6 @@
       }
     },
     "symbols": {
-      "long_sui": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "usdt",
-          "vSui",
-          "afSui",
-          "buck",
-          "nusdc",
-          "suiEth",
-          "ausd"
-        ],
-        "funding_fee_model": "0xfca5656fb055235a5670c6533d75193f486f76d1fa6bb1655a590a7ef7fb5e79",
-        "position_config": "0x1911325bf0d031485947d4c514778806e910c72eb7ac53f9bb880686030c65f6"
-      },
-      "short_sui": {
-        "supported_collaterals": [
-          "sui",
-          "usdc",
-          "usdt",
-          "vSui",
-          "afSui",
-          "buck",
-          "nusdc",
-          "suiEth",
-          "ausd"
-        ],
-        "funding_fee_model": "0x0cdcd3770b05bce4cedecd85486b9f8cbe497dc4ccb9bb10c98d5c72a9ce47c2",
-        "position_config": "0x99746d72c16c038512a5de734242dceeee31f3603440e53b3cb1ae0122f4d932"
-      },
       "long_cetus": {
         "supported_collaterals": [
           "sui",
