@@ -776,8 +776,7 @@ export class SudoDataAPI extends OracleAPI {
       params.append('symbol', symbol);
     }
 
-    // const url = `${this.apiEndpoint}/traderEvents?${params}`;
-    const url = `http://localhost:8081/traderEvents?${params}`;
+    const url = `${this.apiEndpoint}/traderEvents?${params}`;
     const res = await fetch(url, {
       method: 'GET',
       headers: {
