@@ -718,16 +718,83 @@ export class SudoDataAPI extends OracleAPI {
     return orderInfoList.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
   }
 
-  public async getHistoryInfoList(trader: string) {
-    const url = `${this.apiEndpoint}/traderEvents?trader=${trader}`;
+  public async getHistoryInfoList(
+    trader: string,
+    page?: number,
+    limit?: number,
+    orderType?: string,
+    symbol?: string
+  ) {
+    const params = new URLSearchParams({ trader });
+    if (page !== undefined) {
+      params.append('page', page.toString());
+    }
+    if (limit !== undefined) {
+      params.append('limit', limit.toString());
+    }
+    if (orderType) {
+      params.append('orderType', orderType);
+    }
+    if (symbol) {
+      params.append('symbol', symbol);
+    }
+
+    const url = `${this.apiEndpoint}/traderEvents?${params}`;
     const res = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    const historyInfoList = await res.json();
-    return historyInfoList;
+    const response = await res.json() as any;
+
+    // Handle both old format (array) and new format (object with data)
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    return response.data?.histories || [];
+  }
+
+  public async getHistoryInfoListWithPagination(
+    trader: string,
+    page = 1,
+    limit = 20,
+    orderType?: string,
+    symbol?: string
+  ) {
+    const params = new URLSearchParams({
+      trader,
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    if (orderType) {
+      params.append('orderType', orderType);
+    }
+    if (symbol) {
+      params.append('symbol', symbol);
+    }
+
+    // const url = `${this.apiEndpoint}/traderEvents?${params}`;
+    const url = `http://localhost:8081/traderEvents?${params}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await res.json() as any;
+
+    return {
+      histories: response.data?.histories || [],
+      pagination: response.data?.pagination || {
+        total: 0,
+        page: 1,
+        limit: 20,
+        pages: 0,
+      },
+    };
   }
 
   simValuate = async (sender: string) => {
