@@ -19,6 +19,9 @@ importers:
       '@mysten/dapp-kit':
         specifier: 0.14.12
         version: 0.14.12(@tanstack/react-query@5.72.2(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.8.2)
+      '@mysten/kiosk':
+        specifier: ^0.9.12
+        version: 0.9.34(typescript@5.8.2)
       '@mysten/sui':
         specifier: 1.28.2
         version: 1.28.2(typescript@5.8.2)
@@ -539,6 +542,10 @@ packages:
     peerDependencies:
       '@tanstack/react-query': ^5.0.0
       react: '*'
+
+  '@mysten/kiosk@0.9.34':
+    resolution: {integrity: sha512-0HlXygbGeW5FEXkptB36JQIfpHvuYCyw4B8uhtnTlVL52zMFrMazrgyqisnm+BJFxFfClz2WMuv98hVXcPtstQ==}
+    engines: {node: '>=18'}
 
   '@mysten/sui@1.28.2':
     resolution: {integrity: sha512-d+lSp3rAtuOX0taIiIv0KNILDsbmAB9koNGHBinfREraGnE9tUFW315UByuyvuZ9K53ji4i2risdtwxCQ1a8Zw==}
@@ -2701,6 +2708,14 @@ snapshots:
       - babel-plugin-macros
       - immer
       - react-dom
+      - typescript
+
+  '@mysten/kiosk@0.9.34(typescript@5.8.2)':
+    dependencies:
+      '@mysten/sui': 1.28.2(typescript@5.8.2)
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
       - typescript
 
   '@mysten/sui@1.28.2(typescript@5.8.2)':

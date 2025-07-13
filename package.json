@@ -1,6 +1,6 @@
 {
   "name": "sudo-sdk",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "SDK for Sudo Finance, Perpetual Protocol on Sui",
   "exports": {
     ".": {
@@ -40,6 +40,7 @@
   "dependencies": {
     "@mysten/dapp-kit": "0.14.12",
     "@mysten/bcs": "^1.1.0",
+    "@mysten/kiosk": "^0.9.12",
     "@mysten/sui": "^1.28.2",
     "@pythnetwork/pyth-sui-js": "2.1.0",
     "decimal.js": "^10.4.3",

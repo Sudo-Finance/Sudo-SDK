@@ -1,7 +1,8 @@
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui/utils';
 import { Transaction } from '@mysten/sui/transactions';
 import { SuiClient } from '@mysten/sui/client';
-import { IPositionConfig, SudoDataAPI } from './sudoData';
+import { KioskClient, KioskOwnerCap, KioskTransaction } from '@mysten/kiosk';
+import { SudoDataAPI } from './sudoData';
 import { joinSymbol } from './utils';
 import {
   ALLOW_TRADE_CAN_TRADE,
@@ -732,6 +733,330 @@ export class SudoAPI extends SudoDataAPI {
       );
     }
 
+    return tx;
+  };
+
+  // S Card
+  openPositionWithSCard = async (
+    collateralToken: string,
+    indexToken: string,
+    size: bigint,
+    collateralAmount: bigint,
+    coinObjects: string[],
+    long: boolean,
+    reserveAmount: bigint,
+    indexPrice: number,
+    collateralPrice: number,
+    isLimitOrder = false,
+    isIocOrder = false,
+    pricesSlippage: number = 0.003,
+    collateralSlippage: number = 0.5,
+    relayerFee = BigInt(0.5),
+    referralAddress = '',
+    sender = '',
+    kioskClient: KioskClient,
+    kioskCap: KioskOwnerCap,
+    scard: string,
+  ) => {
+    let tx = new Transaction();
+    if (referralAddress && !(await this.hasReferral(sender || ''))) {
+      tx = await this.addReferral(referralAddress, tx);
+    }
+    tx = await this.initOracleTxb([collateralToken, indexToken], tx);
+    const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
+    const [depositObject] = tx.splitCoins(coinObject, [
+      tx.pure.u64(collateralAmount),
+    ]);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]); // Sudo contract requires SUI as fee
+
+    const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+    const adjustPrice = this.#processSlippage(indexPrice, long, isLimitOrder ? 0 : pricesSlippage);
+    const adjustCollateralPrice = this.#processSlippage(collateralPrice, false, collateralSlippage);
+
+    let allowTrade = ALLOW_TRADE_MUST_TRADE;
+    if (isLimitOrder) {
+      allowTrade = isIocOrder ? ALLOW_TRADE_NO_TRADE : ALLOW_TRADE_CAN_TRADE;
+    }
+
+    const kioskTx = new KioskTransaction({
+      transaction: tx,
+      kioskClient,
+      cap: kioskCap,
+    });
+
+    const [sudoCard, promise] = kioskTx.borrow({
+      itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+      itemId: scard,
+    });
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::open_position_v1_3`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[collateralToken].module,
+        this.consts.coins[indexToken].module,
+        `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+        this.consts.coins['sui'].module,
+      ],
+      arguments: [
+        tx.object(SUI_CLOCK_OBJECT_ID),
+        tx.object(this.consts.sudoCore.market),
+        tx.object(
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
+        ),
+        tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
+        tx.object(this.consts.sudoCore.symbols[symbol].positionConfig),
+        tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+        tx.object(this.consts.pythFeeder.feeder[indexToken]),
+        depositObject,
+        feeObject,
+        tx.pure.u8(allowTrade),
+        tx.pure.u64(size),
+        tx.pure.u64(reserveAmount),
+        tx.pure.u256(adjustCollateralPrice),
+        tx.pure.u256(adjustPrice),
+        tx.pure.bool(isLimitOrder),
+        sudoCard,
+      ],
+    });
+
+    kioskTx
+      .return({
+        itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+        item: sudoCard,
+        promise: promise,
+      })
+      .finalize();
+    return tx;
+  };
+
+  decreasePositionWithSCard = async (
+    pcpId: string,
+    collateralToken: string,
+    indexToken: string,
+    amount: bigint,
+    long: boolean,
+    indexPrice: number,
+    collateralPrice: number,
+    isTriggerOrder = false,
+    isTakeProfitOrder = true,
+    isIocOrder = false,
+    pricesSlippage: number = 0.003,
+    collateralSlippage: number = 0.5,
+    relayerFee = BigInt(0.5),
+    kioskClient: KioskClient,
+    kioskCap: KioskOwnerCap,
+    scard: string,
+  ) => {
+    const tx = await this.initOracleTxb([collateralToken, indexToken]);
+    const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+    const feeObject = tx.splitCoins(tx.gas, [tx.pure.u64(relayerFee)]); // Sudo contract requires SUI as fee
+
+    const adjustPrice = this.#processSlippage(
+      indexPrice,
+      !long,
+      isTriggerOrder ? 0 : pricesSlippage
+    );
+    const adjustCollateralPrice = this.#processSlippage(
+      collateralPrice,
+      false,
+      collateralSlippage
+    );
+
+    let allowTrade = ALLOW_TRADE_MUST_TRADE;
+    if (isTriggerOrder) {
+      if (isIocOrder || !isTakeProfitOrder) {
+        allowTrade = ALLOW_TRADE_NO_TRADE;
+      } else {
+        allowTrade = ALLOW_TRADE_CAN_TRADE;
+      }
+    } else {
+      isTakeProfitOrder = true;
+    }
+
+    const kioskTx = new KioskTransaction({
+      transaction: tx,
+      kioskClient,
+      cap: kioskCap,
+    });
+
+    const [sudoCard, promise] = kioskTx.borrow({
+      itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+      itemId: scard,
+    });
+
+    tx.moveCall({
+      target: `${this.consts.sudoCore.upgradedPackage}::market::decrease_position_v1_3`,
+      typeArguments: [
+        `${this.consts.sudoCore.package}::slp::SLP`,
+        this.consts.coins[collateralToken].module,
+        this.consts.coins[indexToken].module,
+        `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+        this.consts.coins['sui'].module,
+      ],
+      arguments: [
+        tx.object(SUI_CLOCK_OBJECT_ID),
+        tx.object(this.consts.sudoCore.market),
+        tx.object(pcpId),
+        tx.object(
+          this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
+        ),
+        tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
+        tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+        tx.object(this.consts.pythFeeder.feeder[indexToken]),
+        feeObject,
+        tx.pure.u8(allowTrade),
+        tx.pure.bool(isTakeProfitOrder),
+        tx.pure.u64(amount),
+        tx.pure.u256(adjustCollateralPrice),
+        tx.pure.u256(adjustPrice),
+        tx.pure.bool(isTriggerOrder),
+        sudoCard,
+      ],
+    });
+
+    kioskTx
+      .return({
+        itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+        item: sudoCard,
+        promise: promise,
+      })
+      .finalize();
+    return tx;
+  };
+
+  decreaseMultiPositionsWithSCard = async (positions: Array<{
+    pcpId: string,
+    collateralToken: string,
+    coinObjects: string[],
+    indexToken: string,
+    amount: bigint,
+    long: boolean,
+    indexPrice: number,
+    collateralPrice: number,
+    isTriggerOrder: boolean,
+    isTakeProfitOrder: boolean,
+    isIocOrder: boolean,
+    slippage: number,
+    relayerFee: bigint,
+  }>,
+    kioskClient: KioskClient,
+    kioskCap: KioskOwnerCap,
+    scard: string,
+    tx?: Transaction) => {
+    if (!tx) {
+      tx = new Transaction();
+    }
+    tx = await this.initOracleTxb(positions.map(position => [position.collateralToken, position.indexToken]).flat(), tx);
+
+    const kioskTx = new KioskTransaction({
+      transaction: tx,
+      kioskClient,
+      cap: kioskCap,
+    });
+
+    const [sudoCard, promise] = kioskTx.borrow({
+      itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+      itemId: scard,
+    });
+
+    for (const position of positions) {
+      const {
+        pcpId,
+        collateralToken,
+        coinObjects, indexToken, amount, long, indexPrice, collateralPrice, isTriggerOrder, isTakeProfitOrder, isIocOrder, slippage, relayerFee
+      } = position;
+      let innerIsTakeProfitOrder = isTakeProfitOrder;
+      const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+      const coinObject = this.#processCoins(tx, collateralToken, coinObjects);
+      const feeObject = tx.splitCoins(coinObject, [tx.pure.u64(relayerFee)]);
+
+      const adjustPrice = this.#processSlippage(indexPrice, !long, isTriggerOrder ? 0 : slippage);
+      const adjustCollateralPrice = this.#processSlippage(collateralPrice, false, 0.5);
+
+      let allowTrade = ALLOW_TRADE_MUST_TRADE;
+      if (isTriggerOrder) {
+        allowTrade = isIocOrder || !innerIsTakeProfitOrder ? ALLOW_TRADE_NO_TRADE : ALLOW_TRADE_CAN_TRADE;
+      } else {
+        innerIsTakeProfitOrder = true;
+      }
+
+      tx.moveCall({
+        target: `${this.consts.sudoCore.upgradedPackage}::market::decrease_position_v1_3`,
+        typeArguments: [
+          `${this.consts.sudoCore.package}::slp::SLP`,
+          this.consts.coins[collateralToken].module,
+          this.consts.coins[indexToken].module,
+          `${this.consts.sudoCore.package}::market::${long ? 'LONG' : 'SHORT'}`,
+          this.consts.coins['sui'].module,
+        ],
+        arguments: [
+          tx.object(SUI_CLOCK_OBJECT_ID),
+          tx.object(this.consts.sudoCore.market),
+          tx.object(pcpId),
+          tx.object(
+            this.consts.sudoCore.vaults[collateralToken].reservingFeeModel
+          ),
+          tx.object(this.consts.sudoCore.symbols[symbol].fundingFeeModel),
+          tx.object(this.consts.pythFeeder.feeder[collateralToken]),
+          tx.object(this.consts.pythFeeder.feeder[indexToken]),
+          feeObject,
+          tx.pure.u8(allowTrade),
+          tx.pure.bool(isTakeProfitOrder),
+          tx.pure.u64(amount),
+          tx.pure.u256(adjustCollateralPrice),
+          tx.pure.u256(adjustPrice),
+          tx.pure.bool(isTriggerOrder),
+          sudoCard,
+        ],
+      });
+    }
+
+    kioskTx
+      .return({
+        itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+        item: sudoCard,
+        promise: promise,
+      })
+      .finalize();
+    return tx;
+  };
+
+  claimTokenFromSCard = async (
+    token: string,
+    coinObjects: string[],
+    kioskClient: KioskClient,
+    kioskCap: KioskOwnerCap,
+    scard: string,
+  ) => {
+    const tx = new Transaction();
+    const kioskTx = new KioskTransaction({
+      transaction: tx,
+      kioskClient,
+      cap: kioskCap,
+    });
+
+    const [sudoCard, promise] = kioskTx.borrow({
+      itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+      itemId: scard,
+    });
+
+    // claim tokens
+    coinObjects.forEach(coinObject => {
+      return tx.moveCall({
+        target: `${this.consts.sudoNft.upgradedPackage}::card::claim_token`,
+        typeArguments: [`${this.consts.coins[token].module}`],
+        arguments: [tx.object(sudoCard), tx.object(coinObject)],
+      });
+    });
+
+    kioskTx
+      .return({
+        itemType: `${this.consts.sudoNft.package}::card::SudoCard`,
+        item: sudoCard,
+        promise: promise,
+      })
+      .finalize();
     return tx;
   };
 }
