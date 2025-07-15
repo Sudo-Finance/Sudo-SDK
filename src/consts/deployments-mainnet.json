@@ -705,5 +705,20 @@
     "upgrade_cap": "0xc6d91a6ef4e7a1241f3912dc1df7c568a6ac4489a29c158ff2687ad5b80a2f1b",
     "admin_cap": "0xc5f3788a2e8d8f466d13423b9fec460a35130e0daeaef86b509aa2556d4ced52",
     "pool": "0x14587a366da17ab24ecf5b01cfc52484aab63609b44041202936551049011288"
+  },
+  "sudo_nft": {
+    "package": "0xe7e651e4974fe367aa2837712d68081efb299c470242a15e2b9c26ea326159ec",
+    "upgraded_package": "0xc29243f73547c69e8f14e8a0427bb9da02af4dc6c759d20bad57107339e0d52c",
+    "upgrade_cap": "0xcc5518fafbe38ba93600cdd4c7041e2578aac131369c9eadf3d15d81f623a869",
+    "admin_cap": "0x0dfd61668bd103c480d1e8011ce6bd9db50e797cdd19c0f96fca536e338139ab",
+    "mint_settings": "0xbf5613108c2a6eafab75b357b7a17d064419e82ed9762c7a9060f14a98c91e64",
+    "display_card": "0x08f7bc38cb3dde52b5ad13ce8e193e2a8169892465395b4ec4fc0a01d62c9096",
+    "display_mint_ticket": "0xbe7ac3d3cb7b48a40938c2016f0d83c773475f565e2a39be74bbf6734cb3a818",
+    "card_registry": "0x1206e107d51d0325276c2d1c0a1ad508e828cb816cc4c97c9d1800a882d066e6",
+    "black_card_tracker": "0xbdb19337f16e1d7904e0135982b4a9dde0cfb595eb42a7a4bc44e85dc7ccaea4",
+    "emerald_card_tracker": "0xefec4358f4a0e778958da2bc3f6b589bd86165bed7b7bfb12c7d5df6d1ef7ab1",
+    "silver_card_tracker": "0x381a03245fd3a5619395b848b40b4a24f1612de6992f846201e765c0ee278f5d",
+    "transfer_policy": "0x6685e36d4c024bf04d84aec86090d153b8084e0b9779e45b2e4bd643ef0b2a1d",
+    "transfer_policy_cap": "0xf67f4fd5d8ae3b071be70e4fb7fa34b2c9873bec622bdc3e55fbb1b0ccf5d0ac"
   }
 }
