@@ -647,7 +647,7 @@ export class SudoDataAPI extends OracleAPI {
   }
 
   // find all open positions by positionsParent
-  public async getOpenPositions() {
+  public async getOpenPositions(batchSize: number = 50) {
     let positionDynamicFields: DynamicFieldInfo[] = [];
     let _continue = true;
     let cursor = undefined;
@@ -666,24 +666,29 @@ export class SudoDataAPI extends OracleAPI {
 
     // then we query by dynamic field names and order by time
     const positionInfoList: IPositionInfo[] = [];
-    await Promise.all(
-      positionDynamicFields.map(async positionDynamicField => {
-        const positionRaw = await this.provider.getDynamicFieldObject({
-          parentId: this.consts.sudoCore.positionsParent,
-          name: positionDynamicField.name,
-        });
 
-        if (positionRaw?.data?.content) {
-          const positionInfo = await this.#parsePositionInfo(
-            positionRaw,
-            positionDynamicField.objectId,
-          );
-          if (positionInfo) {
-            positionInfoList.push(positionInfo);
+    for (let i = 0; i < positionDynamicFields.length; i += batchSize) {
+      const batch = positionDynamicFields.slice(i, i + batchSize);
+
+      await Promise.all(
+        batch.map(async positionDynamicField => {
+          const positionRaw = await this.provider.getDynamicFieldObject({
+            parentId: this.consts.sudoCore.positionsParent,
+            name: positionDynamicField.name,
+          });
+
+          if (positionRaw?.data?.content) {
+            const positionInfo = await this.#parsePositionInfo(
+              positionRaw,
+              positionDynamicField.objectId,
+            );
+            if (positionInfo) {
+              positionInfoList.push(positionInfo);
+            }
           }
-        }
-      }),
-    );
+        }),
+      );
+    }
 
     return positionInfoList
       .filter(positionInfo => !positionInfo.closed)
