@@ -9,7 +9,7 @@ import {
 } from './utils';
 import { SUI_CLOCK_OBJECT_ID } from '@mysten/sui/utils';
 import { Transaction } from '@mysten/sui/transactions';
-import { SuiClient } from '@mysten/sui/client';
+import { DynamicFieldInfo, SuiClient } from '@mysten/sui/client';
 import { OracleAPI } from './oracle';
 import { parsePosition } from './parser';
 import { Decimal, SDecimal, SRate, VaultsValuation, SymbolsValuation, Rate } from './bcs';
@@ -644,6 +644,50 @@ export class SudoDataAPI extends OracleAPI {
     return positionInfoList.sort((a, b) =>
       a.openTimestamp > b.openTimestamp ? 1 : -1,
     );
+  }
+
+  // find all open positions by positionsParent
+  public async getOpenPositions() {
+    let positionDynamicFields: DynamicFieldInfo[] = [];
+    let _continue = true;
+    let cursor = undefined;
+    while (_continue) {
+      // data here will be a list of dynamic fields containing name and value
+      const { data, nextCursor, hasNextPage } =
+        await this.provider.getDynamicFields({
+          parentId: this.consts.sudoCore.positionsParent,
+          cursor,
+        });
+
+      positionDynamicFields = positionDynamicFields.concat(data);
+      _continue = hasNextPage;
+      cursor = nextCursor;
+    }
+
+    // then we query by dynamic field names and order by time
+    const positionInfoList: IPositionInfo[] = [];
+    await Promise.all(
+      positionDynamicFields.map(async positionDynamicField => {
+        const positionRaw = await this.provider.getDynamicFieldObject({
+          parentId: this.consts.sudoCore.positionsParent,
+          name: positionDynamicField.name,
+        });
+
+        if (positionRaw?.data?.content) {
+          const positionInfo = await this.#parsePositionInfo(
+            positionRaw,
+            positionDynamicField.objectId,
+          );
+          if (positionInfo) {
+            positionInfoList.push(positionInfo);
+          }
+        }
+      }),
+    );
+
+    return positionInfoList
+      .filter(positionInfo => !positionInfo.closed)
+      .sort((a, b) => (a.openTimestamp > b.openTimestamp ? 1 : -1));
   }
 
   public async getOrderCapInfoList(owner: string) {
