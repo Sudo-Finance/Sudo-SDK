@@ -31,6 +31,13 @@ export interface IVaultInfo {
   enabled: boolean;
   weight: number;
   lastUpdate: number;
+  reservingFeeModel: IReservingFeeModel;
+  priceConfig: {
+    maxInterval: number;
+    maxConfidence: number;
+    precision: number;
+    feeder: string;
+  };
 }
 
 export interface ISymbolInfo {
@@ -43,6 +50,14 @@ export interface ISymbolInfo {
   liquidateEnabled: boolean;
   decreaseEnabled: boolean;
   lastUpdate: number;
+  fundingFeeModel: IFundingFeeModel;
+  long: boolean;
+  priceConfig: {
+    maxInterval: number;
+    maxConfidence: number;
+    precision: number;
+    feeder: string;
+  };
 }
 
 export interface IPositionInfo {
@@ -140,6 +155,18 @@ export interface IPositionConfig {
   minCollateralValue: number;
 }
 
+export interface IReservingFeeModel {
+  multiplier: number;
+}
+
+export interface IFundingFeeModel {
+  multiplier: number;
+  max: number;
+}
+
+// Constants
+const SECONDS_PER_EIGHT_HOUR = 8 * 60 * 60; // 28800 seconds
+
 export interface IHistory {
   owner: string;
   txid: string;
@@ -168,12 +195,28 @@ export class SudoDataAPI extends OracleAPI {
   provider: SuiClient;
   apiEndpoint: string = 'https://api.sudofinance.xyz';
 
+  // Cache properties
+  private vaultInfoCache: { [key: string]: IVaultInfo } = {};
+  private symbolInfoCache: { [key: string]: ISymbolInfo } = {};
+  private cacheTimestamp: number = 0;
+  private cacheValidityDuration: number = 3 * 60000; // 180 seconds
+
   constructor(network: string = 'testnet', provider: SuiClient | null = null) {
     super(network);
     if (provider) {
       this.provider = provider;
     } else {
       this.provider = getProvider(network);
+    }
+  }
+
+  validateCache() {
+    super.validateCache()
+    const now = Date.now();
+    if (now - this.cacheTimestamp > this.cacheValidityDuration) {
+      this.vaultInfoCache = {};
+      this.symbolInfoCache = {};
+      this.cacheTimestamp = now;
     }
   }
 
@@ -259,8 +302,31 @@ export class SudoDataAPI extends OracleAPI {
     };
   }
 
-  #parseVaultInfo(raw: any): IVaultInfo {
+  #parseReservingFeeModel(raw: any): IReservingFeeModel {
+    const fields = raw.data.content.fields;
+    return {
+      multiplier: parseValue(fields.multiplier),
+    };
+  }
+
+  #parseFundingFeeModel(raw: any): IFundingFeeModel {
+    const fields = raw.data.content.fields;
+    return {
+      multiplier: parseValue(fields.multiplier),
+      max: parseValue(fields.max),
+    };
+  }
+
+  #parseVaultInfo = async (raw: any): Promise<IVaultInfo> => {
     const vaultFields = raw.data.content.fields.value.fields;
+    const reservingFeeModelAddr = vaultFields.reserving_fee_model;
+    const reservingFeeModelRaw = await this.provider.getObject({
+      id: reservingFeeModelAddr,
+      options: {
+        showContent: true,
+      },
+    });
+    const reservingFeeModel = this.#parseReservingFeeModel(reservingFeeModelRaw);
 
     return {
       liquidity: parseValue(vaultFields.liquidity),
@@ -272,24 +338,45 @@ export class SudoDataAPI extends OracleAPI {
       enabled: vaultFields.enabled,
       weight: parseValue(vaultFields.weight),
       lastUpdate: parseValue(vaultFields.last_update),
+      reservingFeeModel,
+      priceConfig: {
+        maxInterval: parseValue(vaultFields.price_config.fields.max_interval),
+        maxConfidence: parseValue(vaultFields.price_config.fields.max_confidence),
+        precision: parseValue(vaultFields.price_config.fields.precision),
+        feeder: vaultFields.price_config.fields.feeder,
+      },
     };
   }
 
-  #parseSymbolInfo(raw: any): ISymbolInfo {
-    const fields = raw.data.content.fields.value.fields;
+  #parseSymbolInfo = async (raw: any, long: boolean): Promise<ISymbolInfo> => {
+    const { fields } = raw.data.content.fields.value;
+    const fundingFeeModelAddr = fields.funding_fee_model;
+    const fundingFeeModelRaw = await this.provider.getObject({
+      id: fundingFeeModelAddr,
+      options: {
+        showContent: true,
+      },
+    });
+    const fundingFeeModel = this.#parseFundingFeeModel(fundingFeeModelRaw);
 
     return {
       openingSize: parseValue(fields.opening_size),
       openingAmount: parseValue(fields.opening_amount),
       accFundingRate: parseValue(fields.acc_funding_rate),
       realisedPnl: parseValue(fields.realised_pnl),
-      unrealisedFundingFeeValue: parseValue(
-        fields.unrealised_funding_fee_value,
-      ),
+      unrealisedFundingFeeValue: parseValue(fields.unrealised_funding_fee_value),
       openEnabled: fields.open_enabled,
       liquidateEnabled: fields.liquidate_enabled,
       decreaseEnabled: fields.decrease_enabled,
       lastUpdate: parseValue(fields.last_update),
+      fundingFeeModel,
+      long,
+      priceConfig: {
+        maxInterval: parseValue(fields.price_config.fields.max_interval),
+        maxConfidence: parseValue(fields.price_config.fields.max_confidence),
+        precision: parseValue(fields.price_config.fields.precision),
+        feeder: fields.price_config.fields.feeder,
+      },
     };
   }
 
@@ -343,10 +430,19 @@ export class SudoDataAPI extends OracleAPI {
 
     if (!positionFields.closed) {
       try {
-        positionInfo.reservingFeeAmount =
-          await this.calcPositionReserveFeeAmount(positionInfo);
-        positionInfo.fundingFeeValue = await this.calcPositionFundingFeeValue(
+        positionInfo.reservingFeeAmount = this.#calculatePositionReserveFee(
           positionInfo,
+          await this.getVaultInfo(positionInfo.collateralToken),
+          (await this.getVaultInfo(positionInfo.collateralToken)).reservingFeeModel,
+          Date.now() / 1000
+        );
+        positionInfo.fundingFeeValue = this.#calculatePositionFundingFee(
+          positionInfo,
+          await this.getSymbolInfo(positionInfo.indexToken, positionInfo.long),
+          (await this.getSymbolInfo(positionInfo.indexToken, positionInfo.long)).fundingFeeModel,
+          (await this.getOraclePrice(positionInfo.indexToken)).getPriceUnchecked().getPriceAsNumberUnchecked(),
+          (await this.getMarketInfo()).lpSupplyWithDecimals,
+          Date.now() / 1000
         );
       } catch (e) {
         console.error(e);
@@ -532,6 +628,11 @@ export class SudoDataAPI extends OracleAPI {
   }
 
   public async getVaultInfo(vaultToken: string) {
+    this.validateCache();
+    if (this.vaultInfoCache[vaultToken]) {
+      return this.vaultInfoCache[vaultToken];
+    }
+
     const rawData = await this.provider.getDynamicFieldObject({
       parentId: this.consts.sudoCore.vaultsParent,
       name: {
@@ -539,11 +640,18 @@ export class SudoDataAPI extends OracleAPI {
         value: { dummy_field: false },
       },
     });
-    const vaultInfo = this.#parseVaultInfo(rawData);
+    const vaultInfo = await this.#parseVaultInfo(rawData);
+    this.vaultInfoCache[vaultToken] = vaultInfo;
     return vaultInfo;
   }
 
   public async getSymbolInfo(indexToken: string, long: boolean) {
+    this.validateCache();
+    const symbol = joinSymbol(long ? 'long' : 'short', indexToken);
+    if (this.symbolInfoCache[symbol]) {
+      return this.symbolInfoCache[symbol];
+    }
+
     const rawData = await this.provider.getDynamicFieldObject({
       parentId: this.consts.sudoCore.symbolsParent,
       name: {
@@ -554,7 +662,9 @@ export class SudoDataAPI extends OracleAPI {
       },
     });
 
-    return this.#parseSymbolInfo(rawData);
+    const symbolInfo = await this.#parseSymbolInfo(rawData, long);
+    this.symbolInfoCache[symbol] = symbolInfo;
+    return symbolInfo;
   }
 
   public async getPositionConfig(indexToken: string, long: boolean) {
@@ -647,7 +757,7 @@ export class SudoDataAPI extends OracleAPI {
   }
 
   // find all open positions by positionsParent
-  public async getOpenPositions(batchSize: number = 50) {
+  public async getOpenPositions(batchSize: number = 50, symbol: string = 'sui') {
     let positionDynamicFields: DynamicFieldInfo[] = [];
     let _continue = true;
     let cursor = undefined;
@@ -664,6 +774,24 @@ export class SudoDataAPI extends OracleAPI {
       cursor = nextCursor;
     }
 
+    // Filter by symbol if provided
+    if (symbol && this.consts.coins[symbol]) {
+      const coinModule = symbol === 'sui' ? '0x2::sui::SUI' : this.consts.coins[symbol].module;
+      positionDynamicFields = positionDynamicFields.filter(field => {
+        // Extract the second coin module from PositionName<coin1, coin2, direction>
+        const typeStr = field.name?.type;
+        if (!typeStr) return false;
+
+        const match = typeStr.match(/PositionName<([^,]+),\s*([^,]+),\s*([^>]+)>/);
+        if (!match) return false;
+
+        const secondCoin = match[2].trim();
+        return secondCoin === coinModule;
+      });
+    } else {
+      return [];
+    }
+
     // then we query by dynamic field names and order by time
     const positionInfoList: IPositionInfo[] = [];
 
@@ -678,6 +806,11 @@ export class SudoDataAPI extends OracleAPI {
           });
 
           if (positionRaw?.data?.content) {
+            // @ts-ignore
+            if (positionRaw?.data?.content?.fields?.value?.fields?.closed) {
+              // skip closed positions
+              return;
+            }
             const positionInfo = await this.#parsePositionInfo(
               positionRaw,
               positionDynamicField.objectId,
@@ -1243,5 +1376,59 @@ export class SudoDataAPI extends OracleAPI {
   async hasReferral(referree: string): Promise<boolean> {
     const raw = await this.getReferralData(referree)
     return !raw.error
+  }
+
+  // Helper methods for fee calculations
+  #vaultUtilization(vault: IVaultInfo): number {
+    return vault.liquidity > 0 ? vault.reservedAmount / vault.liquidity : 0;
+  }
+
+  #calcReservingFeeRate(model: IReservingFeeModel, utilization: number, elapsed: number): number {
+    return model.multiplier * utilization * elapsed / SECONDS_PER_EIGHT_HOUR
+  }
+
+  // Fee calculation methods
+  #calculatePositionReserveFee(position: IPositionInfo, vault: IVaultInfo, model: IReservingFeeModel, timestamp: number): number {
+    const accReservingRate = this.#calcAccReservingFeeRate(vault, model, timestamp);
+    return position.reservingFeeAmount + (accReservingRate - position.lastReservingRate) * position.collateralAmount;
+  }
+
+  #calculatePositionFundingFee(position: IPositionInfo, symbol: ISymbolInfo, model: IFundingFeeModel, price: number, lpSupplyAmount: number, timestamp: number): number {
+    const accFundingRate = this.#calcAccFundingFeeRate(symbol, model, price, lpSupplyAmount, timestamp, position.long);
+    return position.fundingFeeValue + (accFundingRate - position.lastFundingRate) * position.positionSize;
+  }
+
+  #calcFundingFeeRate(model: IFundingFeeModel, pnlPerRate: number, elapsed: number): number {
+    const dailyRate = Math.min(model.multiplier * Math.abs(pnlPerRate), model.max);
+    const secondsRate = dailyRate * elapsed / SECONDS_PER_EIGHT_HOUR;
+    return pnlPerRate >= 0 ? -secondsRate : secondsRate;
+  }
+
+  #calcAccReservingFeeRate(vault: IVaultInfo, model: IReservingFeeModel, timestamp: number): number {
+    if (vault.lastUpdate > 0) {
+      const elapsed = timestamp - vault.lastUpdate;
+      if (elapsed > 0) {
+        const utilization = this.#vaultUtilization(vault);
+        return vault.accReservingRate + this.#calcReservingFeeRate(model, utilization, elapsed);
+      }
+    }
+    return vault.accReservingRate;
+  }
+
+  #calcDeltaSize(symbol: ISymbolInfo, price: number, isLong: boolean): number {
+    const latestSize = symbol.openingAmount * price;
+    return isLong ? symbol.openingSize - latestSize : latestSize - symbol.openingSize;
+  }
+
+  #calcAccFundingFeeRate(symbol: ISymbolInfo, model: IFundingFeeModel, price: number, lpSupplyAmount: number, timestamp: number, isLong: boolean): number {
+    if (symbol.lastUpdate > 0) {
+      const elapsed = timestamp - symbol.lastUpdate;
+      if (elapsed > 0) {
+        const deltaSize = this.#calcDeltaSize(symbol, price, isLong);
+        const pnlPerLp = (symbol.realisedPnl + symbol.unrealisedFundingFeeValue + deltaSize) / lpSupplyAmount;
+        return symbol.accFundingRate + this.#calcFundingFeeRate(model, pnlPerLp, elapsed);
+      }
+    }
+    return symbol.accFundingRate;
   }
 }

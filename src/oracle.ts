@@ -21,10 +21,12 @@ export class OracleAPI {
   PythFeederToPriceId: Record<string, string>;
   PythFeederToId: Record<string, string>;
   provider: SuiClient;
+  priceCache: Record<string, PriceFeed>;
 
   constructor(network: string, provider: SuiClient | null = null) {
     this.network = network;
     this.consts = getConsts(network);
+    this.priceCache = {};
     switch (network) {
       case 'testnet':
         this.connectionURL = 'https://hermes-beta.pyth.network';
@@ -44,9 +46,26 @@ export class OracleAPI {
     }
   }
 
+  validateCache() {
+    const now = Date.now() / 1000;
+    for (const key in this.priceCache) {
+      if (now - (this.priceCache[key].getPriceUnchecked().publishTime || 0) > 7) {
+        delete this.priceCache[key];
+      }
+    }
+  }
+
   async getOraclePrice(tokenId: string) {
+    this.validateCache();
+    if (this.priceCache[tokenId]) {
+      return this.priceCache[tokenId];
+    }
     const res = await this.getOraclePrices([tokenId]);
-    // return res[tokenId];
+    if (!res || !res[0]) {
+      throw new Error(`Unknown token: ${tokenId}`);
+    }
+    this.priceCache[tokenId] = res[0];
+    return res[0];
   }
 
   async getOraclePrices(tokens: string[]) {
