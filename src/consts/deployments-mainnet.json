@@ -484,7 +484,6 @@
       "gme": "0xd636a14b206a1d57190385735b980f0f26fdfa507cde63746ea621ce8fafd150",
       "afSui": "0xd779885c5246357e24cbde7348f2d81f756d9650975c02d81346b15d8b557ebf",
       "vSui": "0xf3bc79117acc3636d57778d9d0f83a871df1b7a53eb61fe893ff108d9664ec8b",
-      "fud": "0x4531c3ed0d22f21f5fce882905372006c9aafa30f01db03b789e95a6c50de7b2",
       "buck": "0x3ef821a54dbdfe3f211b2ff7261dea0f0330c72fd292422ce586e21f43809a56",
       "sol": "0x9d0d275efbd37d8a8855f6f2c761fa5983293dd8ce202ee5196626de8fcd4469",
       "btc": "0x9a62b4863bdeaabdc9500fce769cf7e72d5585eeb28a6d26e4cafadc13f76ab2",
@@ -601,11 +600,6 @@
       "decimals": 9,
       "module": "0x549e8b69270defbfafd4f94e17ec44cdbdd99820b33bda2278dea3b9a32d3f55::cert::CERT",
       "metadata": "0xabd84a23467b33854ab25cf862006fd97479f8f6f53e50fe732c43a274d939bd"
-    },
-    "fud": {
-      "decimals": 5,
-      "module": "0x76cb819b01abed502bee8a702b4c2d547532c12f25001c9dea795a5e631c26f1::fud::FUD",
-      "metadata": "0x01087411ef48aaac1eb6e24803213e3a60a03b147dac930e5e341f17a85e524e"
     },
     "buck": {
       "decimals": 9,
