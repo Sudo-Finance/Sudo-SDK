@@ -17,14 +17,6 @@
         "weight": "200000000000000000",
         "reserving_fee_model": "0x06420378d3b4bdba8d5afc2f88d33b7c7640aa14330c35f14c9874289147f15b"
       },
-      "usdc": {
-        "weight": "50000000000000000",
-        "reserving_fee_model": "0x75183cd63566bf3ef9c5d1ec790a28e5b0a75a0901a33b48e1e8423a62a6eb9d"
-      },
-      "usdt": {
-        "weight": "50000000000000000",
-        "reserving_fee_model": "0xbb09fbc5c2103ffcde3c589463c700b7c6cd2c2a462429c6b5fd147c7b1aba4f"
-      },
       "afSui": {
         "weight": "200000000000000000",
         "reserving_fee_model": "0x94243eff61204c6afb510639de396217dbbc0cc838626ce7ae8ab7aa9b30a020"
@@ -40,14 +32,6 @@
       "nusdc": {
         "weight": "100000000000000000",
         "reserving_fee_model": "0xc9f2c56c85589ce19d58a55097234df845fca075a902c4b912d36ba5d21b32de"
-      },
-      "suiEth": {
-        "weight": "50000000000000000",
-        "reserving_fee_model": "0xd0d0b5076dd61ff70205a2f38d3abc6d18974b0ef524bb2dc7631371b5090b8c"
-      },
-      "ausd": {
-        "weight": "50000000000000000",
-        "reserving_fee_model": "0xcf5fcdd8fc9d295f1d44ba68a0b74350fe8191ee6b367dfa8c103c5ebc6f80c0"
       }
     },
     "symbols": {
